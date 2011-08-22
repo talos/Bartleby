@@ -3,6 +3,11 @@ package com.invisiblearchitecture.bartleby;
 import java.io.IOException;
 import java.util.Locale;
 
+import net.microscraper.client.BasicMicroscraper;
+import net.microscraper.client.Microscraper;
+import net.microscraper.database.Database;
+
+import android.R;
 import android.os.Bundle;
 
 import android.widget.Button;
@@ -19,17 +24,6 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.invisiblearchitecture.bartleby.BartlebyLocation.LocationResult;
 import com.invisiblearchitecture.bartleby.BartlebyOverlay.BartlebyOverlayItem;
-import com.invisiblearchitecture.scraper.Information;
-import com.invisiblearchitecture.scraper.JSONInformationFactory;
-import com.invisiblearchitecture.scraper.JSONInterface;
-import com.invisiblearchitecture.scraper.Publisher;
-import com.invisiblearchitecture.scraper.HttpInterface;
-import com.invisiblearchitecture.scraper.LogInterface;
-import com.invisiblearchitecture.scraper.RegexInterface;
-import com.invisiblearchitecture.scraper.impl.ApacheHttpInterface;
-import com.invisiblearchitecture.scraper.impl.JSONME;
-import com.invisiblearchitecture.scraper.impl.JavaUtilRegexInterface;
-import com.invisiblearchitecture.bartleby.R;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -45,11 +39,6 @@ import android.view.View.OnClickListener;
 
 
 public class Bartleby extends MapActivity {	
-
-	public static final HttpInterface httpInterface = new ApacheHttpInterface();
-	public static final RegexInterface regexInterface = new JavaUtilRegexInterface();
-	public static final LogInterface logger = new AndroidLogInterface();
-	public static final JSONInterface jsonInterface = new JSONME();
 	
 	// TODO: Clean this area up.
 	private MapView mapView;
@@ -79,8 +68,9 @@ public class Bartleby extends MapActivity {
 	private final int propertyInfoDialogID = 1;
 	private final int wrongAddressAlertDialogID = 2;
 	
-	private JSONInformationFactory factory;
-			
+	private Microscraper scraper;
+	private Database database;
+				
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,25 +82,8 @@ public class Bartleby extends MapActivity {
 		    // Set up dialog info display.
 		    propertyInfoDialog = new PropertyInfoDialog(this);
 		    progressDialog = new ProgressDialog(this);
-
-			// Set up property factory.
-			factory = new JSONInformationFactory("http://www.simplescraper.net:4567/client", "test", httpInterface, logger,
-					regexInterface, jsonInterface,
-					new AsyncCollector(false), new Publisher() {
-						@Override
-						public void publishProgress(Information information,
-								int progressPart, int progressTotal) {
-							//publishAddress(information);
-							logger.i("publishing progress " + Integer.toString(progressPart) + " of "  + Integer.toString(progressTotal) +  " on propertyinfodialog");
-							propertyInfoDialog.publish(information, progressPart, progressTotal);							
-						}
-						@Override
-						public void publish(Information information) {
-							//publishAddress(information);
-							logger.i("publishing propertyinfodialog");
-							propertyInfoDialog.publish(information, 1, 1);
-						}
-			});
+		    
+		    scraper = BasicMicroscraper.get(database, 100, 100);
 			
 			lookup_button = (Button) findViewById(R.id.button_lookup);
 			error_view = (TextView) findViewById(R.id.text_error);

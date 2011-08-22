@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Scraper"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Scraper Default Implementation"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Microscraper Base"/>
+	<classpathentry kind="src" path="/MicroScraper Utility"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
