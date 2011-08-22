@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bartleby</string>
+
+    <string name="wrong_address_button">That\'s not right!</string>
+    <string name="lookup_button">Get info</string>
+    <string name="address_change_button">Change address</string>
+
+    <string name="requesting_generic">Requesting information.</string>
+    <string name="receiving_generic">Waiting to receive \'%s\'.</string>
+    
+    <string name="requesting_tax_lot">Obtaining tax lot.</string>
+    <string name="receiving_tax_lot">Receiving tax lot info.</string>
+    
+    <string name="requesting_records">Requesting property records.</string>
+    <string name="receiving_records">Receiving property records.</string>
+</resources>

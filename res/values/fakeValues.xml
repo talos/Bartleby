@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--
+<dimen name="fake_latitude">40.687538px</dimen>
+<dimen name="fake_longitude">-73.985749px</dimen>
+-->
+<dimen name="fake_latitude">40.627307916989615px</dimen>
+<dimen name="fake_longitude">-73.96820068359375px</dimen>
+
+<dimen name="fake_accuracy">10.0px</dimen>
+<string name="fake_provider">373 Atlantic Ave</string>
+</resources>
