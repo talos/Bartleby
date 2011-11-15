@@ -12,24 +12,15 @@
     	android:layout_height="300px"
     	android:layout_alignParentTop="true"
     	android:clickable="true"
-    	android:apiKey="0YJhaf0cmFP3F05nOrpT-F3qLlYcDNDya_tUbpg"
+    	android:apiKey="0YJhaf0cmFP2sjDfBz8wbj-Pyp6nJjPzaTBLBow"
     /> 
-    <!--   Compile on Windows (47:26:FC:9C:2F:7B:02:74:DF:55:0B:96:4D:1F:CD:CD)
-    <com.google.android.maps.MapView
-    	android:id="@+id/mapview"
-    	android:layout_width="fill_parent"
-    	android:layout_height="300px"
-    	android:layout_alignParentTop="true"
-    	android:clickable="true"
-    	android:apiKey="0YJhaf0cmFP1_4EaQNVOyrvLNqM6eSwJBIb4rhw"
-    />-->
-	<ZoomControls android:id="@+id/zoomcontrols"
+<!-- 	<ZoomControls android:id="@+id/zoomcontrols"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:gravity="center_horizontal"
 		android:layout_alignBottom="@id/mapview"
 
-		/>
+		/>-->
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	    android:orientation="vertical"
 	    android:layout_width="fill_parent"

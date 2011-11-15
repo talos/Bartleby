@@ -8,9 +8,9 @@
     <string name="lenders_header">Lenders:</string>
     <string name="no_lenders">Could not find any lenders.</string>
     
-    <string name="error_geocode">Could not figure out where %s %s, %s is.</string>
+    <string name="error_geocode" formatted="false">Could not figure out where %s %s, %s is.</string>
     <string name="error_reverse_geocode">Could not obtain address for the point you just clicked.</string>
-    <string name="error_address_lookup">%s %s, %s is an invalid address.  Try modifying it.</string>
+    <string name="error_address_lookup" formatted="false">%s %s, %s is an invalid address.  Try modifying it.</string>
     
     <string name="violations_complaints_header">Violations and complaints:</string>
     <string name="complaints_count">%s complaints.</string>

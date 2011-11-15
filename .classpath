@@ -3,7 +3,12 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Microscraper Base"/>
-	<classpathentry kind="src" path="/MicroScraper Utility"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Caustic Core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Caustic Java Util Regexp"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Caustic JavaNet Browser"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Caustic JSON ME"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Caustic Default Implementation"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Caustic Android Library"/>
+	<classpathentry kind="src" path="Caustic Android Library_src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

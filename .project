@@ -30,4 +30,11 @@
 		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>Caustic Android Library_src</name>
+			<type>2</type>
+			<locationURI>_android_Caustic_Android_Library_f3d05b1c/src</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
