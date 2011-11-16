@@ -8,7 +8,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 
-import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.invisiblearchitecture.bartleby.util.GeoUtils;
@@ -36,13 +35,7 @@ class BartlebyLocationListener implements LocationListener {
 	public void onLocationChanged(Location location) {
 		controller.animateTo(GeoUtils.geoPointFromLocation(location));
 		controller.setZoom(CLOSE_ENOUGH);
-		locator.finished();
-		/*
-    	timer1.cancel();
-        locationResult.gotLocation(location);
-        lm.removeUpdates(this);
-        lm.removeUpdates(locationListenerNetwork);
-        */
+		locator.finished(this);
 	}
 	
 	@Override

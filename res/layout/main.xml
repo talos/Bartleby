@@ -1,90 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/master"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-    <!--  Compile on Mac -->
-     <com.google.android.maps.MapView
-    	android:id="@+id/mapview"
-    	android:layout_width="fill_parent"
-    	android:layout_height="300px"
-    	android:layout_alignParentTop="true"
-    	android:clickable="true"
-    	android:apiKey="0YJhaf0cmFP2sjDfBz8wbj-Pyp6nJjPzaTBLBow"
-    /> 
-<!-- 	<ZoomControls android:id="@+id/zoomcontrols"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center_horizontal"
-		android:layout_alignBottom="@id/mapview"
-
-		/>-->
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	    android:orientation="vertical"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_below="@id/mapview"
-    	>
-		<LinearLayout android:id="@+id/address_holder"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			>
-			<EditText
-				android:id="@+id/streetNum"
-				android:inputType="number"
-				android:selectAllOnFocus="true"
-				android:layout_width="60sp"
-				android:layout_height="wrap_content"
-				/>
-			<EditText
-				android:id="@+id/streetName"
-				android:selectAllOnFocus="true"
-				android:inputType="text"
-				android:layout_width="130sp"
-				android:layout_height="wrap_content"
-				/>
-			<EditText
-				android:id="@+id/city"
-				android:selectAllOnFocus="true"
-				android:inputType="text"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				/>
-				<!-- 
-			<AutoCompleteTextView
-				android:id="@+id/autocomplete_city"
-				android:completionThreshold="1"
-				android:selectAllOnFocus="true"
-				android:inputType="textAutoComplete"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				/>-->
-		</LinearLayout>
-		<LinearLayout android:id="@+id/buttons_holder"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			>
-			<Button android:id="@+id/button_lookup"
+	<AutoCompleteTextView android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/lookup_button"
-				/>
-		</LinearLayout>
-	</LinearLayout>
-	<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			android:id="@+id/error_holder"
-			android:layout_width="wrap_content"
+				android:id="@+id/autocomplete_address"
+				android:completionThreshold="@integer/completion_threshold"
+				android:inputType="textAutoComplete"
+				android:hint="@string/address_hint"
+				android:selectAllOnFocus="true"
+				android:layout_alignParentTop="true"
+				android:layout_alignParentLeft="true"
+				android:layout_above="@+id/mapview"
+				android:layout_toLeftOf="@+id/button_lookup">
+	 	<requestFocus></requestFocus>
+	</AutoCompleteTextView>
+	<Button android:text="@string/lookup_button"
 			android:layout_height="wrap_content"
+			android:layout_width="wrap_content" 
+			android:id="@+id/button_lookup"
+			android:layout_alignParentTop="true"
+			android:layout_alignParentRight="true"></Button>
+	<com.google.android.maps.MapView android:layout_height="300px"
+			android:clickable="true"
+			android:id="@+id/mapview"
 			android:layout_alignParentBottom="true"
-			android:background="@color/error"
-		>
-		<TextView android:id="@+id/text_error"
-			    android:layout_width="wrap_content" 
-			    android:layout_height="wrap_content"
-			/>
-	</RelativeLayout>
+			android:layout_below="@+id/button_lookup"
+			android:layout_width="fill_parent"
+			android:apiKey="0YJhaf0cmFP2sjDfBz8wbj-Pyp6nJjPzaTBLBow"
+			></com.google.android.maps.MapView>
 </RelativeLayout>

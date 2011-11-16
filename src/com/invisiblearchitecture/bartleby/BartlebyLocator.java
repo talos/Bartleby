@@ -21,17 +21,15 @@ import android.os.Build;
  * From http://stackoverflow.com/questions/3145089/what-is-the-simplest-and-most-robust-way-to-get-the-users-current-location-in-an/3145655#3145655
  * Thanks!
  */
-public class BartlebyLocator {
+class BartlebyLocator {
 	//private final Timer timer;
 	private final LocationManager lm;
-	private final BartlebyLocationListener listener;
 	private boolean gpsEnabled = false;
 	private boolean networkEnabled = false;
 	private final boolean emulation;
 
-	public BartlebyLocator(Context context, MapView map) {
+	public BartlebyLocator(Context context) {
 		this.lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		this.listener = new BartlebyLocationListener(map, this);
 		
 		try {
 			gpsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -51,7 +49,13 @@ public class BartlebyLocator {
 		}
 	}
 	
-	public void locate() {
+	/**
+	 * Start to try to find where we are.  
+	 * @param map The {@link MapView} to pan.
+	 */
+	public void locate(MapView map) {
+		BartlebyLocationListener listener = new BartlebyLocationListener(map, this);
+
 		if(emulation == true) {
 			listener.onLocationChanged(GeoUtils.NYC);
 		} else {
@@ -71,7 +75,10 @@ public class BartlebyLocator {
 		}
 	}
 	
-	protected void finished() {
+	/**
+	 * Stop checking the {@link LocationManager} for updates.
+	 */
+	protected void finished(BartlebyLocationListener listener) {
 		lm.removeUpdates(listener);
 	}
 	/*

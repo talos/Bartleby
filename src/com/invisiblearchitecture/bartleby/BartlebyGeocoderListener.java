@@ -4,13 +4,29 @@
  */
 package com.invisiblearchitecture.bartleby;
 
+import java.io.IOException;
+import java.util.List;
+
+import android.location.Address;
+
 /**
+ * Listener called by {@link BartlebyGeocoder}. This receives
+ * notices whenever a location lookup callback finishes, or
+ * an exception occurs while looking up a location.
  * @author talos
  *
  */
-public class BartlebyGeocoderListener {
+interface BartlebyGeocoderListener {
 
-	public found(String number, String name, String city) {
-		
-	}
+	/**
+	 * This is called when a series of addresses have been found.
+	 * @param addresses
+	 */
+	public abstract void onFound(List<Address> addresses);
+	
+	/**
+	 * This is called when an {@link IOException} has occurred.
+	 * @param e
+	 */
+	public abstract void onError(IOException e);
 }

@@ -10,19 +10,6 @@ package com.invisiblearchitecture.bartleby;
 public final class R {
     public static final class attr {
     }
-    public static final class color {
-        public static final int error=0x7f050000;
-    }
-    public static final class dimen {
-        public static final int fake_accuracy=0x7f060002;
-        /** 
-<dimen name="fake_latitude">40.687538px</dimen>
-<dimen name="fake_longitude">-73.985749px</dimen>
-
-         */
-        public static final int fake_latitude=0x7f060000;
-        public static final int fake_longitude=0x7f060001;
-    }
     public static final class drawable {
         public static final int icon=0x7f020000;
         public static final int marker=0x7f020001;
@@ -33,47 +20,27 @@ public final class R {
         public static final int markerredlarge=0x7f020006;
     }
     public static final class id {
-        public static final int address_holder=0x7f070002;
-        public static final int button_lookup=0x7f070007;
-        public static final int buttons_holder=0x7f070006;
-        public static final int city=0x7f070005;
-        public static final int error_holder=0x7f070008;
-        public static final int mapview=0x7f070001;
-        public static final int master=0x7f070000;
-        public static final int streetName=0x7f070004;
-        public static final int streetNum=0x7f070003;
-        public static final int table=0x7f07000a;
-        public static final int text_error=0x7f070009;
+        public static final int autocomplete_address=0x7f060001;
+        public static final int button_lookup=0x7f060003;
+        public static final int mapview=0x7f060002;
+        public static final int master=0x7f060000;
+        public static final int table=0x7f060004;
+    }
+    public static final class integer {
+        public static final int completion_threshold=0x7f050000;
     }
     public static final class layout {
         public static final int caustic=0x7f030000;
-        public static final int main=0x7f030001;
-        public static final int table=0x7f030002;
+        public static final int list_item=0x7f030001;
+        public static final int main=0x7f030002;
+        public static final int table=0x7f030003;
     }
     public static final class string {
-        public static final int address_change_button=0x7f040005;
+        public static final int address_hint=0x7f040002;
         public static final int app_name=0x7f040001;
-        public static final int complaints_count=0x7f040016;
-        public static final int error_address_lookup=0x7f040014;
-        public static final int error_geocode=0x7f040012;
-        public static final int error_reverse_geocode=0x7f040013;
-        public static final int fake_provider=0x7f040002;
         public static final int hello=0x7f040000;
-        public static final int lenders_header=0x7f040010;
-        public static final int lookup_button=0x7f040004;
-        public static final int no_lenders=0x7f040011;
-        public static final int no_owner=0x7f04000d;
-        public static final int owner_price=0x7f04000f;
-        public static final int owner_since=0x7f04000e;
-        public static final int owners_header=0x7f04000c;
-        public static final int receiving_generic=0x7f040007;
-        public static final int receiving_records=0x7f04000b;
-        public static final int receiving_tax_lot=0x7f040009;
-        public static final int requesting_generic=0x7f040006;
-        public static final int requesting_records=0x7f04000a;
-        public static final int requesting_tax_lot=0x7f040008;
-        public static final int violations_complaints_header=0x7f040015;
-        public static final int violations_count=0x7f040017;
-        public static final int wrong_address_button=0x7f040003;
+        public static final int lookup_button=0x7f040003;
+        public static final int receiving_generic=0x7f040005;
+        public static final int requesting_generic=0x7f040004;
     }
 }

@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
@@ -38,21 +39,25 @@ import com.google.android.maps.Overlay;
 public class Bartleby extends MapActivity {
 	private static int NUM_THREADS = 4; // number of threads for scraping
 	
-	private Logger logger;
-	private Scraper scraper = new Scraper(NUM_THREADS);
+	//private Logger logger;
+	//private Scraper scraper = new Scraper(NUM_THREADS);
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		logger = new AndroidLogger(getApplicationContext());
+		//logger = new AndroidLogger(getApplicationContext());
 				
 		setContentView(R.layout.main);
 		
-		//TableLayout table = (TableLayout) findViewById(R.id.table);
-		
 		MapView mapView = setupMapView();
 		panToCurrentLocation(mapView);
+		
+		BartlebyGeocoder geocoder = new BartlebyGeocoder(this, mapView);
+		
+		AutoCompleteAddressTextView tv = setupAddressTextView(geocoder);
+		
+		setupGoButton(tv, geocoder, mapView);
 		/*
 		Map<String, String> input = new HashMap<String, String>();
 		input.put("Number", "157");
@@ -72,7 +77,6 @@ public class Bartleby extends MapActivity {
     private MapView setupMapView() {
 		MapView mapView = (MapView) findViewById(R.id.mapview);
 	    mapView.setBuiltInZoomControls(true);
-	    logger.i("set up map view");
 	    return mapView;
     }
     
@@ -80,9 +84,29 @@ public class Bartleby extends MapActivity {
      * Pan to the current location to start.
      */
     private void panToCurrentLocation(MapView mapView) {
-	    logger.i("panning");
-
-    	new BartlebyLocator(this, mapView).locate();
+    	new BartlebyLocator(this).locate(mapView);
+    }
+    
+    /**
+     * Set up the address text view to autocomplete.
+     * @param mapView the {@link MapView} that will be used for boundaries of autocomplete.
+     * @return
+     */
+    private AutoCompleteAddressTextView setupAddressTextView(BartlebyGeocoder geocoder) {
+    	return new AutoCompleteAddressTextView(this, geocoder,
+    			(AutoCompleteTextView) findViewById(R.id.autocomplete_address));
+    }
+    
+    /**
+     * Link 'Go' button to going to address, placing marker.
+     * @param tv the {@link AutoCompleteAddressTextView} to read address from.
+     * @return
+     */
+    private BartlebyGoButton setupGoButton(AutoCompleteAddressTextView tv,
+    		BartlebyGeocoder geocoder, MapView mapView) {
+    	return new BartlebyGoButton(this, 
+    			(Button) findViewById(R.id.button_lookup), geocoder, mapView, tv);
+    	
     }
 		/*
 		// Add the GeograpeOverlay, which is itemized.
