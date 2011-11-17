@@ -8,16 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
-import android.content.res.Resources.Theme;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.StateListDrawable;
-import android.util.Log;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
-import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
-import com.google.android.maps.OverlayItem;
 import com.readystatesoftware.mapviewballoons.BalloonItemizedOverlay;
 import com.readystatesoftware.mapviewballoons.BalloonOverlayView;
 
@@ -29,6 +24,7 @@ import com.readystatesoftware.mapviewballoons.BalloonOverlayView;
 class BartlebyItemOverlay extends BalloonItemizedOverlay<BartlebyItem> {
 	private final List<BartlebyItem> items = new ArrayList<BartlebyItem>();
 	private final Activity activity;
+	private final BartlebyScraper scraper;
 	//private final OnFocusChangeListener focusChangedListener = new BartlebyFocusChangedListener();
 		
 	/**
@@ -40,17 +36,18 @@ class BartlebyItemOverlay extends BalloonItemizedOverlay<BartlebyItem> {
 	 * 
 	 * @param marker The {@link Drawable} marker that will be used in the {@link ItemizedOverlay}.
 	 */
-	public BartlebyItemOverlay(Activity activity, Drawable marker, MapView mapView) {
+	public BartlebyItemOverlay(Activity activity, Drawable marker, MapView mapView, BartlebyScraper scraper) {
 		super(boundCenterBottom(marker), mapView);
 		setDrawFocusedItem(true);
 		
+		this.scraper = scraper;
 		this.activity = activity;
 		
 		populate();
 	}
 	
 	public void addItem(GeoPoint gp, ThreePartAddress address) {
-		BartlebyItem item = new BartlebyItem(activity, gp, address);
+		BartlebyItem item = new BartlebyItem(gp, address);
 	    items.add(item);
 	    populate();
 	    setFocus(item);
@@ -69,38 +66,6 @@ class BartlebyItemOverlay extends BalloonItemizedOverlay<BartlebyItem> {
 	
 	@Override
 	protected BalloonOverlayView<BartlebyItem> createBalloonOverlayView() {
-	//	return new BartlebyBalloonOverlayView(getMapView().getContext(), getBalloonBottomOffset());
-		return new BartlebyBalloonOverlayView(activity, getBalloonBottomOffset());
+		return new BartlebyBalloonOverlayView(activity, getBalloonBottomOffset(), scraper);
 	}
-	
-	/*@Override
-	protected boolean onTap (int index) {		
-		BartlebyItem item = items.get(index);
-		item.showDialog();
-		//item.scrapeInfo();
-		//setFocus(item);
-		return true;
-	}*/
-	
-	/**
-	 * This {@link OnFocusChangeListener} handles what happens when a new {@link OverlayItem}
-	 * is clicked.
-	 * @author talos
-	 *
-	 */
-	/*
-	private static class BartlebyFocusChangedListener implements OnFocusChangeListener {
-		@SuppressWarnings("rawtypes") // In order to get the @Override to work...
-		@Override
-		public void onFocusChanged(ItemizedOverlay overlay, OverlayItem newFocus) {
-			if(newFocus == null) {
-				return;
-			}
-			//BartlebyOverlayItem oldItem = (BartlebyOverlayItem) overlay.nextFocus(false);
-			BartlebyOverlayItem newItem = (BartlebyOverlayItem) newFocus;
-			
-			// Publish address info etc.
-			newItem.scrapeInfo();
-		}
-	}*/
 }

@@ -4,6 +4,7 @@
  */
 package com.invisiblearchitecture.bartleby;
 
+import net.caustic.log.AndroidLogger;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,10 +25,12 @@ public class Bartleby extends MapActivity {
 		super.onCreate(savedInstanceState);
 						
 		setContentView(R.layout.main);
-				
+		
+		BartlebyScraper scraper = new BartlebyScraper(this);
+		
 		MapView mapView = setupMapView();
 		BartlebyItemOverlay itemOverlay = new BartlebyItemOverlay(
-				this, getResources().getDrawable(R.drawable.marker), mapView);
+				this, getResources().getDrawable(R.drawable.marker), mapView, scraper);
 		
 		BartlebyGeocoder geocoder = new BartlebyGeocoder(this, mapView);
 		

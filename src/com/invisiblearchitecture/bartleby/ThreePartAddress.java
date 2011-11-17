@@ -8,12 +8,13 @@ import android.location.Address;
 
 /**
  * A three part address contains just a street number,
- * a street name and a ZIP code.
+ * a street name and a ZIP code.  It overrides {@link #equals(Object)}
+ * and {@link #hashCode()}.
  * @author talos
  *
  */
 
-class ThreePartAddress {
+final class ThreePartAddress {
 	public final String number;
 	public final String street;
 	public final String zip;
@@ -40,5 +41,27 @@ class ThreePartAddress {
 			}
 		}
 		number = tentativeNumber;
+	}
+	
+	/**
+	 * Two {@link ThreePartAddress}es are equal if {@link Object#equals(Object)} is <code>true</code>
+	 * for {@link #number}, {@link #street} and {@link #zip}.
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == this) {
+			return true;
+		} else if(obj instanceof ThreePartAddress) {
+			ThreePartAddress that = (ThreePartAddress) obj;
+			if(that.number.equals(number) && that.street.equals(street) && that.zip.equals(zip)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return number.hashCode() + street.hashCode() + zip.hashCode();
 	}
 }
