@@ -7,28 +7,25 @@ package com.invisiblearchitecture.bartleby;
 import android.location.Address;
 
 /**
- * A four part address contains just a street number,
- * a street name, a city, and a ZIP code.
+ * A three part address contains just a street number,
+ * a street name and a ZIP code.
  * @author talos
  *
  */
 
-class FourPartAddress {
+class ThreePartAddress {
 	public final String number;
 	public final String street;
-	public final String city;
 	public final String zip;
 	
-	public FourPartAddress(Address address) throws InvalidAddressException {
+	public ThreePartAddress(Address address) throws InvalidFourPartAddressException {
 		if(address.getThoroughfare() == null || 
-				address.getLocality() == null ||
 				address.getPostalCode() == null ) {
-			throw new InvalidAddressException();
+			throw new InvalidFourPartAddressException(address);
 		}
 		
 		// get rid of apt numbers
 		street = address.getThoroughfare().split("#")[0].trim();
-		city = address.getLocality();
 		zip = address.getPostalCode();
 		
 		// Find the street number by looking through all the address
@@ -43,9 +40,5 @@ class FourPartAddress {
 			}
 		}
 		number = tentativeNumber;
-	}
-	
-	public String toString() {
-		return number + " " + street + ", " + city + ", " + zip;
 	}
 }

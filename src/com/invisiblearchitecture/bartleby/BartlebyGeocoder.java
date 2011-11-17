@@ -94,11 +94,11 @@ final class BartlebyGeocoder {
 	/**
 	 * Look up an address by lat/lon.  Calls back <code>listener</code>, including
 	 * if an exception occurred. 
-	 * @param latitude
-	 * @param longitude
+	 * @param latitude a <code>double</code> latitude.
+	 * @param longitude a <code>double</code> longitude.
 	 * @param listener
 	 */
-	public void lookup(final int latitude, final int longitude, final BartlebyGeocoderListener listener) {
+	public void lookup(final double latitude, final double longitude, final BartlebyGeocoderListener listener) {
 		cancelLastSearch();
 		lastSearch = worker.submit(new Runnable() {
 			public void run() {

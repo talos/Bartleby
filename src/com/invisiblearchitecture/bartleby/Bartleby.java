@@ -4,163 +4,82 @@
  */
 package com.invisiblearchitecture.bartleby;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import net.caustic.Scraper;
-import net.caustic.android.ViewScraperListener;
-import net.caustic.log.AndroidLogger;
-import net.caustic.log.Logger;
-
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.graphics.drawable.StateListDrawable;
-import android.location.Geocoder;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TableLayout;
-import android.widget.TextView;
-import android.widget.ZoomControls;
 
-import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
-import com.google.android.maps.Overlay;
 
 /**
  * @author talos
  *
  */
 public class Bartleby extends MapActivity {
-	private static int NUM_THREADS = 4; // number of threads for scraping
 	
-	//private Logger logger;
-	//private Scraper scraper = new Scraper(NUM_THREADS);
-	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		//logger = new AndroidLogger(getApplicationContext());
-				
+						
 		setContentView(R.layout.main);
-		
+				
 		MapView mapView = setupMapView();
-		panToCurrentLocation(mapView);
+		BartlebyItemOverlay itemOverlay = new BartlebyItemOverlay(
+				this, getResources().getDrawable(R.drawable.marker), mapView);
 		
 		BartlebyGeocoder geocoder = new BartlebyGeocoder(this, mapView);
 		
 		AutoCompleteAddressTextView tv = setupAddressTextView(geocoder);
 		
-		setupGoButton(tv, geocoder, mapView);
-		/*
-		Map<String, String> input = new HashMap<String, String>();
-		input.put("Number", "157");
-		input.put("Street", "Pulaski St");
-		input.put("Borough", "3");
-		input.put("Apt", "");
-		scraper.register(logger);
-		scraper.addListener(new ViewScraperListener(this, table));
+		GoToLocationGeocoderListener listener =
+				new GoToLocationGeocoderListener(this, mapView, tv, itemOverlay);
+		setupGoButton(geocoder, tv, listener);
+		BartlebyFallThroughOverlay fallThrough = new BartlebyFallThroughOverlay(geocoder, listener);
 		
-		scraper.scrape("https://raw.github.com/talos/caustic/master/fixtures/json/nyc/nyc-property-owner.json", input);
-    */
-    }
-    
-    /**
-     * Set up the map view.
-     */
-    private MapView setupMapView() {
-		MapView mapView = (MapView) findViewById(R.id.mapview);
-	    mapView.setBuiltInZoomControls(true);
-	    return mapView;
-    }
-    
-    /**
-     * Pan to the current location to start.
-     */
-    private void panToCurrentLocation(MapView mapView) {
-    	new BartlebyLocator(this).locate(mapView);
-    }
-    
-    /**
-     * Set up the address text view to autocomplete.
-     * @param mapView the {@link MapView} that will be used for boundaries of autocomplete.
-     * @return
-     */
-    private AutoCompleteAddressTextView setupAddressTextView(BartlebyGeocoder geocoder) {
-    	return new AutoCompleteAddressTextView(this, geocoder,
-    			(AutoCompleteTextView) findViewById(R.id.autocomplete_address));
-    }
-    
-    /**
-     * Link 'Go' button to going to address, placing marker.
-     * @param tv the {@link AutoCompleteAddressTextView} to read address from.
-     * @return
-     */
-    private BartlebyGoButton setupGoButton(AutoCompleteAddressTextView tv,
-    		BartlebyGeocoder geocoder, MapView mapView) {
-    	return new BartlebyGoButton(this, 
-    			(Button) findViewById(R.id.button_lookup), geocoder, mapView, tv);
-    	
-    }
-		/*
-		// Add the GeograpeOverlay, which is itemized.
-		StateListDrawable marker = (StateListDrawable) this.getResources().getDrawable(R.drawable.);
-		
-		propertyOverlay = new BartlebyOverlay(marker, mapController);
-		
-		// An overlay to receive clicks that fell through PropertyOverlay.
-		Overlay bottomOverlay = new Overlay() {
-			@Override
-			public boolean onTap(GeoPoint gp, MapView mapView) {
-				try {
-			        addPropertyAtPoint(gp);
-					return true;
-				} catch(Exception e) {
-					error_view.setText(e.toString());
-					e.printStackTrace();
-					return false;
-				}
-			}
-		};
-		mapView.getOverlays().add(bottomOverlay);
-		mapView.getOverlays().add(propertyOverlay);
-		
-		BartlebyLocation myLocation = new BartlebyLocation();
-		myLocation.getLocation(this, new HandleLocationUpdate());
-		
-		// What to do when the user asks for information.
-		lookup_button.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				String streetNum = streetNumEditText.getText().toString();
-				String streetName = streetNameEditText.getText().toString();
-				String city = cityEditText.getText().toString();
-				// Add the property if the user has changed the text inputs.
-				// This will NOT add repetitive properties, as addProperty()
-				// will check before adding.
-				if(propertyOverlay.getFocus() != null) {
-					UniversalAddress oldAddress = propertyOverlay.getFocus().address;
-					if(oldAddress.equals(streetNum + " " + streetName, city) == false) {
-						addPropertyAtEnteredString(streetNum, streetName, city);
-					} else {
-						showDialog(propertyInfoDialogID);
-					}
-				}
-			}
-		});*/
+		mapView.getOverlays().add(fallThrough);
+		mapView.getOverlays().add(itemOverlay);
+	}
 	
-	/* (non-Javadoc)
-	 * @see com.google.android.maps.MapActivity#isRouteDisplayed()
+	/**
+	 * Set up the map view, panning to current location.
 	 */
+	private MapView setupMapView() {
+		MapView mapView = (MapView) findViewById(R.id.mapview);
+		Log.i("bartleby", mapView.toString());
+		mapView.setBuiltInZoomControls(true);
+		new BartlebyLocator(this).locate(mapView);
+		return mapView;
+	}
+	
+	/**
+	 * Set up the address text view to autocomplete.
+	 * @param mapView the {@link MapView} that will be used for boundaries of autocomplete.
+	 * @return
+	 */
+	private AutoCompleteAddressTextView setupAddressTextView(BartlebyGeocoder geocoder) {
+		return new AutoCompleteAddressTextView(this, geocoder,
+				(AutoCompleteTextView) findViewById(R.id.autocomplete_address));
+	}
+	
+	/**
+	 * Link 'Go' button to {@link GoToLocationGeocoderListener}.
+	 * @param tv the {@link AutoCompleteAddressTextView} to read address from.
+	 * @return
+	 */
+	private void setupGoButton(final BartlebyGeocoder geocoder, final AutoCompleteAddressTextView tv, final GoToLocationGeocoderListener listener) {
+		findViewById(R.id.button_lookup).setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				geocoder.lookup(tv.getText(), listener);
+			}
+		});
+	}
+	
 	@Override
 	protected boolean isRouteDisplayed() {
-		// TODO Auto-generated method stub
 		return false;
 	}
-
 }

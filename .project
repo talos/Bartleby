@@ -36,5 +36,10 @@
 			<type>2</type>
 			<locationURI>_android_Caustic_Android_Library_f3d05b1c/src</locationURI>
 		</link>
+		<link>
+			<name>android-mapviewballoons_src</name>
+			<type>2</type>
+			<locationURI>_android_android_mapviewballoons_9ae9cbc7/src</locationURI>
+		</link>
 	</linkedResources>
 </projectDescription>
