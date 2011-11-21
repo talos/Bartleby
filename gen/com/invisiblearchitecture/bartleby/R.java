@@ -44,13 +44,16 @@ public final class R {
         public static final int list_item=0x7f030002;
         public static final int main=0x7f030003;
         public static final int table=0x7f030004;
+        public static final int wait=0x7f030005;
     }
     public static final class string {
         public static final int address_hint=0x7f040002;
-        public static final int app_name=0x7f040000;
-        public static final int hello=0x7f040001;
+        public static final int app_name=0x7f040001;
+        public static final int hello=0x7f040000;
+        public static final int loading=0x7f040007;
         public static final int lookup_button=0x7f040003;
         public static final int receiving_generic=0x7f040005;
         public static final int requesting_generic=0x7f040004;
+        public static final int root_url=0x7f040006;
     }
 }

@@ -36,8 +36,13 @@ final class ThreePartAddress {
 		for(int i = 0 ; i < maxLine ; i ++) {
 			String addressLine = address.getAddressLine(i);
 			if(addressLine.contains(street)) {
-				tentativeNumber = addressLine.split(street)[0].trim();
-				break;
+				String[] splitAddressLine = addressLine.split(street);
+				if(splitAddressLine.length > 0) {
+					tentativeNumber = addressLine.split(street)[0].trim();
+					break;
+				} else {
+					throw new InvalidFourPartAddressException(address);
+				}
 			}
 		}
 		number = tentativeNumber;

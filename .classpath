@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Caustic Android Library"/>
 	<classpathentry kind="src" path="/android-mapviewballoons"/>
 	<classpathentry kind="src" path="android-mapviewballoons_src"/>
+	<classpathentry kind="src" path="Caustic Android Library_src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

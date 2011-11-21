@@ -11,10 +11,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.caustic.LogScraperListener;
 import net.caustic.ScraperListener;
 import net.caustic.database.Database;
 import net.caustic.http.HttpBrowser;
 import net.caustic.instruction.Instruction;
+import net.caustic.log.AndroidLogger;
 import net.caustic.scope.Scope;
 import net.caustic.util.StringUtils;
 import android.app.Activity;
@@ -39,7 +41,7 @@ public class BartlebyBalloonOverlayView extends BalloonOverlayView<BartlebyItem>
 	private final TextView snippet;
 	private final BartlebyScraper scraper;
 	
-	private final Map<ThreePartAddress, String[]> addressOwners =
+	private final Map<ThreePartAddress, String[]> snippets =
 			Collections.synchronizedMap(new HashMap<ThreePartAddress, String[]>());
 	
 	/**
@@ -58,6 +60,7 @@ public class BartlebyBalloonOverlayView extends BalloonOverlayView<BartlebyItem>
 		this.scraper = scraper;
 		title = (TextView) findViewById(R.id.balloon_item_title);
 		snippet = (TextView) findViewById(R.id.balloon_item_snippet);
+		
 	}
 	
 	/**
@@ -68,38 +71,33 @@ public class BartlebyBalloonOverlayView extends BalloonOverlayView<BartlebyItem>
 		super.setData(item);
 		
 		ThreePartAddress address = item.getAddress();
-		if(curAddress != null) {
-			synchronized(this.curAddress) {
-				curAddress = address;
-			}
-		} else {
-			curAddress = address;
-		}
+		curAddress = address;
 		
 		title.setVisibility(View.VISIBLE);
 		title.setText(address.number + " " + address.street);
 		
-		synchronized(addressOwners) {
-			if(addressOwners.containsKey(address)) {
+		displaySnippetForAddress(address);
+	}
+	
+	private void displaySnippetForAddress(final ThreePartAddress address) {
+		
+		synchronized(snippets) {
+			if(snippets.containsKey(address)) {
 				// if addressOwners already contains text, set it to the text.
-				displayCurrentOwners();
+
+				activity.runOnUiThread(new Runnable() {
+					public void run() {
+						if(curAddress.equals(address)) {
+							snippet.setText(StringUtils.join(snippets.get(address), ", "));
+							snippet.setVisibility(View.VISIBLE);
+						}
+					}
+				});
 			} else {
 				snippet.setVisibility(View.GONE);
 				scraper.scrape(address, new BartlebyBalloonOverlayItemScraperListener(address));
 			}
 		}
-	}
-
-	/**
-	 * Only call this when syncrhonized on {@link #addressOwners}.
-	 */
-	private void displayCurrentOwners() {
-		activity.runOnUiThread(new Runnable() {
-			public void run() {
-				snippet.setText(StringUtils.join(addressOwners.get(curAddress), ", "));
-				snippet.setVisibility(View.VISIBLE);				
-			}
-		});
 	}
 	
 	/**
@@ -107,16 +105,20 @@ public class BartlebyBalloonOverlayView extends BalloonOverlayView<BartlebyItem>
 	 * @author talos
 	 *
 	 */
-	private class BartlebyBalloonOverlayItemScraperListener implements ScraperListener {
+	private class BartlebyBalloonOverlayItemScraperListener extends LogScraperListener {
 		
 		private final ThreePartAddress address;
+		
 		BartlebyBalloonOverlayItemScraperListener(ThreePartAddress address) {
+			super(new AndroidLogger(activity));
 			this.address = address;
 		}
 		
 		@Override
-		public void onScrape(Instruction instruction, Database db, Scope scope,
-				Scope parent, String parentSource, HttpBrowser browser) { }
+		public void onReady(Instruction instruction, Database db, Scope scope,
+				Scope parent, String source, HttpBrowser browser, Runnable start) {
+			start.run();
+		}
 		
 		@Override
 		public void onSuccess(Instruction instruction, Database db,
@@ -126,32 +128,32 @@ public class BartlebyBalloonOverlayView extends BalloonOverlayView<BartlebyItem>
 			if(key.contains(OWNER)) {
 				// isolate distinct owners
 				Set<String> owners = new HashSet<String>(Arrays.asList(results));
-				synchronized(addressOwners) {
-					addressOwners.put(address, owners.toArray(new String[owners.size()]));
-					displayCurrentOwners();
+				synchronized(snippets) {
+					snippets.put(address, owners.toArray(new String[owners.size()]));
 				}
+				displaySnippetForAddress(address);
 			}
+			super.onSuccess(instruction, db, scope, parent, source, key, results);
 		}
 		
-		@Override
-		public void onMissingTags(Instruction instruction, Database db,
-				Scope scope, Scope parent, String source, HttpBrowser browser,
-				String[] missingTags) { }
-
-		@Override
 		public void onFailed(Instruction instruction, Database db, Scope scope,
-				Scope parent, String source, String failedBecause) {  }
-
-		@Override
-		public void onFinish(int successful, int stuck, int failed) {
-
-		}
-
-		@Override
-		public void onCrashed(Instruction instruction, Scope scope,
-				Scope parent, String source, Throwable e) {
-			e.printStackTrace();
+				Scope parent, String source, String failedBecause) {
+			synchronized(snippets) {
+				snippets.put(address, new String[] { failedBecause });
+			}
+			displaySnippetForAddress(address);
+			
+			super.onFailed(instruction, db, scope, parent, source, failedBecause);
 		}
 		
+
+		public void onCrashed(Instruction instruction, Scope scope, Scope parent,
+				String source, Throwable e) {
+			synchronized(snippets) {
+				snippets.put(address, new String[] { e.toString() });
+			}
+			
+			super.onCrashed(instruction, scope, parent, source, e);
+		}
 	}
 }

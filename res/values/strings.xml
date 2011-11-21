@@ -8,4 +8,6 @@
     <string name="requesting_generic">Requesting information.</string>
     <string name="receiving_generic">Waiting to receive \'%s\'.</string>
     
+    <string name="root_url">http://173.255.232.140:6767/</string>
+    <string name="loading">Loading data...</string>
 </resources>

@@ -7,6 +7,7 @@ package com.invisiblearchitecture.bartleby;
 import java.util.Hashtable;
 
 import android.content.Context;
+import android.util.Log;
 import net.caustic.Scraper;
 import net.caustic.ScraperListener;
 import net.caustic.log.AndroidLogger;
@@ -26,18 +27,19 @@ class BartlebyScraper {
 	private static final String NUMBER = "Number";
 	private static final String STREET = "Street";
 	
-	/**
-	 * The base url for getting instructions.  ZIP is appended to the end of this.
-	 */
-	private static final String BASE_URL = "http://192.168.1.3/~talos/bartleby/nyc-property-owner.json";
-	
 	private final Scraper scraper;
 	private final AndroidLogger logger;
+
+	/**
+	 * The root url for getting instructions.  ZIP/ is appended to the end of this.
+	 */
+	private final String rootURL;
 	
 	public BartlebyScraper(Context context) {
 		this.scraper = new Scraper(NUM_THREADS);
 		this.logger = new AndroidLogger(context);
 		this.scraper.register(logger);
+		this.rootURL = context.getString(R.string.root_url);
 	}
 	
 	public void scrape(ThreePartAddress address, ScraperListener listener) {
@@ -47,7 +49,7 @@ class BartlebyScraper {
 		
 		input.put("Borough", "3");
 		input.put("Apt", "");
-		scraper.scrape(BASE_URL, input, listener);
-		//scraper.scrape(BASE_URL + address.zip, input);
+		
+		scraper.scrape(rootURL + address.zip + "/", input, listener);
 	}
 }
