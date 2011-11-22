@@ -25,11 +25,6 @@ import android.widget.AutoCompleteTextView;
  */
 final class AutoCompleteAddressTextView {
 	
-	/**
-	 * How many characters must be entered before calling reverse geocode
-	 */
-	//private static final int MIN_CHARS_ENTERED = 6;
-	
 	private final AutoCompleteTextView tv;
 	
 	/**
@@ -104,7 +99,8 @@ final class AutoCompleteAddressTextView {
 			activity.runOnUiThread(new Runnable() {
 				public void run() {
 					ArrayAdapter<String> adapter =
-							new ArrayAdapter<String>(tv.getContext(), R.layout.list_item);
+							new ArrayAdapter<String>(tv.getContext(), R.layout.autocomplete_item);
+					// add each address separately, because compressAddress has to be called.
 					for(Address address : addresses) {
 						adapter.add(AddressUtils.compressAddress(address));
 					}

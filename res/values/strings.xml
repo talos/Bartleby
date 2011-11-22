@@ -3,11 +3,10 @@
     <string name="app_name">Bartleby</string>
     
     <string name="address_hint">Look Up Address</string>
-	<string name="lookup_button">Go</string>
-		
-    <string name="requesting_generic">Requesting information.</string>
-    <string name="receiving_generic">Waiting to receive \'%s\'.</string>
-    
+	    
     <string name="root_url">http://173.255.232.140:6767/</string>
     <string name="loading">Loading data...</string>
+    
+    <string name="failed">Could not get data for address.</string>
+    <string name="crashed">No scrapers for address: you should write some!</string>
 </resources>

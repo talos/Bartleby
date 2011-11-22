@@ -47,9 +47,6 @@ class BartlebyScraper {
 		input.put(NUMBER, address.number);
 		input.put(STREET, address.street);
 		
-		input.put("Borough", "3");
-		input.put("Apt", "");
-		
 		scraper.scrape(rootURL + address.zip + "/", input, listener);
 	}
 }

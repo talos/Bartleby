@@ -9,7 +9,7 @@ package com.invisiblearchitecture.bartleby;
  * @author talos
  *
  */
-public class BartlebyException extends Exception {
+class BartlebyException extends Exception {
 
 	protected BartlebyException() {}
 	protected BartlebyException(String detailMessage) {

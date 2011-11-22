@@ -2,11 +2,11 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android"
     android:constantSize="false">
     <item
-        android:drawable="@drawable/markerblue"
+        android:drawable="@drawable/green_marker"
         android:state_focused="false"
         />
     <item
-    	android:drawable="@drawable/markerredlarge"
+    	android:drawable="@drawable/red_marker"
     	android:state_focused="true"
     	/>
 </selector>

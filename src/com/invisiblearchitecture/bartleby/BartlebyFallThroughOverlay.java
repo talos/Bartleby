@@ -4,10 +4,6 @@
  */
 package com.invisiblearchitecture.bartleby;
 
-import java.io.IOException;
-import java.util.List;
-
-import android.location.Address;
 import android.util.Log;
 
 import com.google.android.maps.GeoPoint;
@@ -32,9 +28,7 @@ class BartlebyFallThroughOverlay extends Overlay {
 	}
 	
 	@Override
-	public boolean onTap(GeoPoint gp, MapView mapView) {
-		Log.i("Bartleby", "on tap for below");
-		
+	public boolean onTap(GeoPoint gp, MapView mapView) {		
 		geocoder.lookup(gp.getLatitudeE6() /1E6, gp.getLongitudeE6() / 1E6, listener);
 		
 		return true;

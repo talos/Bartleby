@@ -57,7 +57,7 @@ class GoToLocationGeocoderListener implements BartlebyGeocoderListener {
 							tv.setText(AddressUtils.compressAddress(address));
 							try {
 								overlay.addItem(gp, new ThreePartAddress(address));
-							} catch(InvalidFourPartAddressException e) {
+							} catch(InvalidThreePartAddressException e) {
 								Log.i("bartleby", "invalid address: " + address.toString());
 							}
 						}

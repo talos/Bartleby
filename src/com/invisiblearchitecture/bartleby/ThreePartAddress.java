@@ -19,10 +19,10 @@ final class ThreePartAddress {
 	public final String street;
 	public final String zip;
 	
-	public ThreePartAddress(Address address) throws InvalidFourPartAddressException {
+	public ThreePartAddress(Address address) throws InvalidThreePartAddressException {
 		if(address.getThoroughfare() == null || 
 				address.getPostalCode() == null ) {
-			throw new InvalidFourPartAddressException(address);
+			throw new InvalidThreePartAddressException(address);
 		}
 		
 		// get rid of apt numbers
@@ -41,7 +41,7 @@ final class ThreePartAddress {
 					tentativeNumber = addressLine.split(street)[0].trim();
 					break;
 				} else {
-					throw new InvalidFourPartAddressException(address);
+					throw new InvalidThreePartAddressException(address);
 				}
 			}
 		}

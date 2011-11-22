@@ -12,13 +12,13 @@ import android.location.Address;
  * @author talos
  *
  */
-class InvalidFourPartAddressException extends BartlebyException {
+class InvalidThreePartAddressException extends BartlebyException {
 	
 	/**
 	 * 
 	 * @param address The {@link Address} that could not be turned into a four-part address.
 	 */
-	public InvalidFourPartAddressException(Address address) {
-		super(address.toString() + " did not have an extractable number, street, city, and zip.");
+	public InvalidThreePartAddressException(Address address) {
+		super(address.toString() + " did not have an extractable number, street and zip.");
 	}
 }

@@ -4,15 +4,26 @@
  */
 package com.invisiblearchitecture.bartleby;
 
-import net.caustic.log.AndroidLogger;
+import java.util.List;
+
+import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AutoCompleteTextView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
+import com.google.android.maps.Overlay;
 
 /**
  * @author talos
@@ -20,51 +31,85 @@ import com.google.android.maps.MapView;
  */
 public class Bartleby extends MapActivity {
 	
+	private static final int ABOUT_DIALOG_ID = 0;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-						
+		
+		// Inflate main layout.
 		setContentView(R.layout.main);
 		
 		BartlebyScraper scraper = new BartlebyScraper(this);
 		
-		MapView mapView = setupMapView();
-		BartlebyItemOverlay itemOverlay = new BartlebyItemOverlay(
-				this, getResources().getDrawable(R.drawable.marker), mapView, scraper);
+		// Set up the mapView.
+		MapView mapView = (MapView) findViewById(R.id.mapview);
+		mapView.setBuiltInZoomControls(true);
+		new BartlebyLocator(this).locate(mapView); // Pan to our current location.
 		
 		BartlebyGeocoder geocoder = new BartlebyGeocoder(this, mapView);
 		
-		AutoCompleteAddressTextView tv = setupAddressTextView(geocoder);
+		BartlebyItemOverlay itemOverlay = new BartlebyItemOverlay(
+				this, getResources().getDrawable(R.drawable.marker), mapView, scraper);
+		
+		// Set up the auto-complete address text view.
+		AutoCompleteAddressTextView tv = new AutoCompleteAddressTextView(this, geocoder,
+				(AutoCompleteTextView) findViewById(R.id.autocomplete_address));
 		
 		GoToLocationGeocoderListener listener =
 				new GoToLocationGeocoderListener(this, mapView, tv, itemOverlay);
 		setupGoButton(geocoder, tv, listener);
+		
+		// This overlay catches all random clicks and creates new points.
 		BartlebyFallThroughOverlay fallThrough = new BartlebyFallThroughOverlay(geocoder, listener);
 		
-		mapView.getOverlays().add(fallThrough);
-		mapView.getOverlays().add(itemOverlay);
+		// Add the overlays.
+		List<Overlay> overlays = mapView.getOverlays();
+		overlays.add(fallThrough);
+		overlays.add(itemOverlay);
 	}
 	
+
 	/**
-	 * Set up the map view, panning to current location.
+	 * Create the options menu.
 	 */
-	private MapView setupMapView() {
-		MapView mapView = (MapView) findViewById(R.id.mapview);
-		Log.i("bartleby", mapView.toString());
-		mapView.setBuiltInZoomControls(true);
-		new BartlebyLocator(this).locate(mapView);
-		return mapView;
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.main, menu);
+	    
+	    // When about is clicked, open up the about dialog box.
+	    MenuItem about = menu.findItem(R.id.about);
+	    about.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				showDialog(ABOUT_DIALOG_ID);
+				return true;
+			}
+		});
+	    return true;
 	}
 	
-	/**
-	 * Set up the address text view to autocomplete.
-	 * @param mapView the {@link MapView} that will be used for boundaries of autocomplete.
-	 * @return
-	 */
-	private AutoCompleteAddressTextView setupAddressTextView(BartlebyGeocoder geocoder) {
-		return new AutoCompleteAddressTextView(this, geocoder,
-				(AutoCompleteTextView) findViewById(R.id.autocomplete_address));
+	@Override
+	protected boolean isRouteDisplayed() {
+		return false;
 	}
+	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+	    Dialog dialog;
+	    switch(id) {
+	    case ABOUT_DIALOG_ID:
+	        // do the work to define the pause Dialog
+	    	dialog = new AboutDialog(this);
+	        break;
+	    default:
+	        dialog = null;
+	    }
+	    return dialog;
+	}
+	
 	
 	/**
 	 * Link 'Go' button to {@link GoToLocationGeocoderListener}.
@@ -79,10 +124,5 @@ public class Bartleby extends MapActivity {
 				geocoder.lookup(tv.getText(), listener);
 			}
 		});
-	}
-	
-	@Override
-	protected boolean isRouteDisplayed() {
-		return false;
 	}
 }

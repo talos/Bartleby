@@ -9,6 +9,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
+import android.text.util.Linkify;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
@@ -25,21 +26,15 @@ class BartlebyItemOverlay extends BalloonItemizedOverlay<BartlebyItem> {
 	private final List<BartlebyItem> items = new ArrayList<BartlebyItem>();
 	private final Activity activity;
 	private final BartlebyScraper scraper;
-	//private final OnFocusChangeListener focusChangedListener = new BartlebyFocusChangedListener();
-		
-	/**
-	 * This lets us pan to the selection easily.
-	 */
-	//private final MapController controller;
 	
 	/**
 	 * 
 	 * @param marker The {@link Drawable} marker that will be used in the {@link ItemizedOverlay}.
 	 */
 	public BartlebyItemOverlay(Activity activity, Drawable marker, MapView mapView, BartlebyScraper scraper) {
-		super(boundCenterBottom(marker), mapView);
+		super(boundCenter(marker), mapView);
 		setDrawFocusedItem(true);
-		
+		//int the = android.R.drawable.ic_menu_search;
 		this.scraper = scraper;
 		this.activity = activity;
 		
@@ -51,7 +46,6 @@ class BartlebyItemOverlay extends BalloonItemizedOverlay<BartlebyItem> {
 	    items.add(item);
 	    populate();
 	    setFocus(item);
-	    //item.showDialog();
 	}
 	
 	@Override
