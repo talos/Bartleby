@@ -7,7 +7,6 @@ package com.accursedware.bartleby;
 import java.util.Hashtable;
 
 import android.content.Context;
-import android.util.Log;
 import net.caustic.Scraper;
 import net.caustic.ScraperListener;
 import net.caustic.log.AndroidLogger;
@@ -28,7 +27,6 @@ class BartlebyScraper {
 	private static final String STREET = "Street";
 	
 	private final Scraper scraper;
-	private final AndroidLogger logger;
 
 	/**
 	 * The root url for getting instructions.  ZIP/ is appended to the end of this.
@@ -37,8 +35,11 @@ class BartlebyScraper {
 	
 	public BartlebyScraper(Context context) {
 		this.scraper = new Scraper(NUM_THREADS);
-		this.logger = new AndroidLogger(context);
-		this.scraper.register(logger);
+		
+		// if we're in debug mode, log things.
+		if(context.getResources().getBoolean(R.bool.debug) == true) {
+			this.scraper.register(new AndroidLogger(context));
+		}
 		this.rootURL = context.getString(R.string.root_url);
 	}
 	

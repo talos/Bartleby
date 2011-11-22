@@ -53,7 +53,7 @@ class BartlebyLocator {
 	 * Start to try to find where we are.  
 	 * @param map The {@link MapView} to pan.
 	 */
-	public void locate(MapView map) {
+	public void locate(MapView map) throws NoLocationProvidersException {
 		BartlebyLocationListener listener = new BartlebyLocationListener(map, this);
 
 		if(emulation == true) {
@@ -62,7 +62,8 @@ class BartlebyLocator {
 			//don't start listeners if no provider is enabled
 			if(!gpsEnabled && !networkEnabled) {
 				//TODO: some warning about lack of location access?
-				throw new RuntimeException("Cannot look up location, no providers available");
+				//throw new RuntimeException("Cannot look up location, no providers available");
+				//listener.onLocationChanged(GeoUtils.NYC);
 			}
 			if(gpsEnabled) {
 				lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);

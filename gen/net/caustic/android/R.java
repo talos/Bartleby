@@ -9,9 +9,12 @@ package net.caustic.android;
 
 public final class R {
     public static final class array {
-        public static final int about_paragraphs=0x7f050000;
+        public static final int about_paragraphs=0x7f070000;
     }
     public static final class attr {
+    }
+    public static final class bool {
+        public static final int debug=0x7f050000;
     }
     public static final class drawable {
         public static final int balloon_overlay_bg_selector=0x7f020000;
@@ -26,20 +29,21 @@ public final class R {
         public static final int red_marker=0x7f020009;
     }
     public static final class id {
-        public static final int about=0x7f08000c;
-        public static final int about_text=0x7f080000;
-        public static final int autocomplete_address=0x7f080008;
-        public static final int balloon_inner_layout=0x7f080002;
-        public static final int balloon_item_snippet=0x7f080004;
-        public static final int balloon_item_title=0x7f080003;
-        public static final int balloon_main_layout=0x7f080001;
-        public static final int button_lookup=0x7f08000a;
-        public static final int close_img_button=0x7f080005;
-        public static final int loading=0x7f080006;
-        public static final int mapview=0x7f080009;
-        public static final int master=0x7f080007;
-        public static final int options=0x7f08000d;
-        public static final int owners=0x7f08000b;
+        public static final int about=0x7f0a000d;
+        public static final int about_text=0x7f0a0000;
+        public static final int autocomplete_address=0x7f0a0009;
+        public static final int balloon_inner_layout=0x7f0a0003;
+        public static final int balloon_item_snippet=0x7f0a0005;
+        public static final int balloon_item_title=0x7f0a0004;
+        public static final int balloon_main_layout=0x7f0a0002;
+        public static final int button_lookup=0x7f0a000b;
+        public static final int close_img_button=0x7f0a0006;
+        public static final int loading=0x7f0a0007;
+        public static final int mapview=0x7f0a000a;
+        public static final int master=0x7f0a0008;
+        public static final int options=0x7f0a000e;
+        public static final int owners=0x7f0a000c;
+        public static final int version_text=0x7f0a0001;
     }
     public static final class integer {
         public static final int completion_threshold=0x7f060000;
@@ -56,19 +60,27 @@ public final class R {
         public static final int paragraph_item=0x7f030008;
     }
     public static final class menu {
-        public static final int main=0x7f070000;
+        public static final int main=0x7f090000;
     }
     public static final class string {
-        public static final int about=0x7f040004;
-        public static final int about_title=0x7f040002;
-        public static final int address_hint=0x7f040006;
-        public static final int app_name=0x7f040001;
-        public static final int crashed=0x7f04000a;
-        public static final int failed=0x7f040009;
-        public static final int google_maps_api_key=0x7f040003;
-        public static final int hello=0x7f040000;
-        public static final int loading=0x7f040008;
-        public static final int options=0x7f040005;
-        public static final int root_url=0x7f040007;
+        public static final int about=0x7f040003;
+        public static final int about_title=0x7f04000b;
+        public static final int address_hint=0x7f040005;
+        public static final int app_name=0x7f040000;
+        public static final int crashed=0x7f040009;
+        public static final int failed=0x7f040008;
+        /**   PRODUCTION  :: bartleby.keystore 
+         */
+        public static final int google_maps_api_key=0x7f040002;
+        /**   DEVELOPMENT :: debug.keystore 
+         */
+        public static final int google_maps_api_key_disabled=0x7f040001;
+        public static final int loading=0x7f040007;
+        public static final int no_package_info=0x7f04000a;
+        public static final int options=0x7f040004;
+        public static final int root_url=0x7f040006;
+    }
+    public static final class style {
+        public static final int Version=0x7f080000;
     }
 }

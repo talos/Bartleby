@@ -7,9 +7,8 @@ package com.accursedware.bartleby;
 import java.util.List;
 
 import android.app.Dialog;
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,9 +16,6 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AutoCompleteTextView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
@@ -32,11 +28,12 @@ import com.google.android.maps.Overlay;
 public class Bartleby extends MapActivity {
 	
 	private static final int ABOUT_DIALOG_ID = 0;
+	private static final int ERROR_DIALOG_ID = 1;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+				
 		// Inflate main layout.
 		setContentView(R.layout.main);
 		
@@ -45,7 +42,12 @@ public class Bartleby extends MapActivity {
 		// Set up the mapView.
 		MapView mapView = (MapView) findViewById(R.id.mapview);
 		mapView.setBuiltInZoomControls(true);
-		new BartlebyLocator(this).locate(mapView); // Pan to our current location.
+		try {
+			new BartlebyLocator(this).locate(mapView); // Pan to our current location.
+		} catch(NoLocationProvidersException e) {
+			// For now, punt this.  It's not a big deal if there's no geolocation to start.
+			//showDialog(ERROR_DIALOG_ID);
+		}
 		
 		BartlebyGeocoder geocoder = new BartlebyGeocoder(this, mapView);
 		
@@ -104,6 +106,9 @@ public class Bartleby extends MapActivity {
 	        // do the work to define the pause Dialog
 	    	dialog = new AboutDialog(this);
 	        break;
+	    /*case ERROR_DIALOG_ID:
+	    	dialog = new ErrorDialog();
+	    	break;*/
 	    default:
 	        dialog = null;
 	    }
