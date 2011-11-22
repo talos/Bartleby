@@ -9,4 +9,5 @@
     
     <string name="failed">Could not get data for address.</string>
     <string name="crashed">No scrapers for address: you should write some!</string>
+    
 </resources>

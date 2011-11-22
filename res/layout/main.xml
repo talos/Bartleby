@@ -33,6 +33,6 @@
 			android:layout_below="@+id/button_lookup"
 			android:layout_width="fill_parent"
 			android:layout_alignParentBottom="true"
-			android:apiKey="0YJhaf0cmFP2sjDfBz8wbj-Pyp6nJjPzaTBLBow"
+			android:apiKey="@string/google_maps_api_key"
 			></com.google.android.maps.MapView>
 </RelativeLayout>

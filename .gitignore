@@ -1,1 +1,14 @@
+# Temp files. #
 *.log
+
+# Compiled source. #
+*.class
+
+# Protected key files. #
+keys.xml
+
+# These are big and most people don't care. #
+_pre_production/*
+
+# OS-specific files. #
+.DS_Store*
