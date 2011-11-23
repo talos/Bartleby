@@ -16,7 +16,9 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 
+import com.accursedware.bartleby.geocoding.AsyncGeocoder;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
@@ -28,12 +30,17 @@ import com.google.android.maps.Overlay;
 public class Bartleby extends MapActivity {
 	
 	private static final int ABOUT_DIALOG_ID = 0;
-	private static final int ERROR_DIALOG_ID = 1;
+	private static final int NO_LOCATOR_DIALOG_ID = 1;
 	
+	private Locator locator;
+	
+	/**
+	 * Set up app basics, inflate views etc.
+	 */
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-				
+		
 		// Inflate main layout.
 		setContentView(R.layout.main);
 		
@@ -42,35 +49,46 @@ public class Bartleby extends MapActivity {
 		// Set up the mapView.
 		MapView mapView = (MapView) findViewById(R.id.mapview);
 		mapView.setBuiltInZoomControls(true);
-		try {
-			new BartlebyLocator(this).locate(mapView); // Pan to our current location.
-		} catch(NoLocationProvidersException e) {
-			// For now, punt this.  It's not a big deal if there's no geolocation to start.
-			//showDialog(ERROR_DIALOG_ID);
-		}
+		locator = new Locator(this, mapView.getController());
 		
-		BartlebyGeocoder geocoder = new BartlebyGeocoder(this, mapView);
+		final AsyncGeocoder geocoder = new AsyncGeocoder(this);
 		
-		BartlebyItemOverlay itemOverlay = new BartlebyItemOverlay(
+		PropertyOverlay propertyOverlay = new PropertyOverlay(
 				this, getResources().getDrawable(R.drawable.marker), mapView, scraper);
 		
 		// Set up the auto-complete address text view.
-		AutoCompleteAddressTextView tv = new AutoCompleteAddressTextView(this, geocoder,
-				(AutoCompleteTextView) findViewById(R.id.autocomplete_address));
+		final AddressSearchView searchView = new AddressSearchView(this, geocoder,
+				(AutoCompleteTextView) findViewById(R.id.autocomplete_address),
+				mapView, propertyOverlay);
 		
-		GoToLocationGeocoderListener listener =
-				new GoToLocationGeocoderListener(this, mapView, tv, itemOverlay);
-		setupGoButton(geocoder, tv, listener);
+		// Set up lookup button to search for currently entered address.
+		new AddressSearchButton(this, geocoder, findViewById(R.id.button_lookup),
+				searchView, mapView, propertyOverlay);
 		
 		// This overlay catches all random clicks and creates new points.
-		BartlebyFallThroughOverlay fallThrough = new BartlebyFallThroughOverlay(geocoder, listener);
+		FallThroughOverlay fallThrough = new FallThroughOverlay(this, geocoder, mapView.getController(),
+				searchView, propertyOverlay);
 		
 		// Add the overlays.
 		List<Overlay> overlays = mapView.getOverlays();
 		overlays.add(fallThrough);
-		overlays.add(itemOverlay);
+		overlays.add(propertyOverlay);
 	}
 	
+	/**
+	 * When the application resumes, look up where we are now.  Let the user
+	 * know if we can't find out.
+	 */
+	@Override
+	protected void onResume() {
+		super.onResume();
+		try {
+			locator.locate(); // Pan to our current location.
+		} catch(NoLocationProvidersException e) {
+			showDialog(NO_LOCATOR_DIALOG_ID);
+		}
+		
+	}
 
 	/**
 	 * Create the options menu.
@@ -100,34 +118,18 @@ public class Bartleby extends MapActivity {
 	
 	@Override
 	protected Dialog onCreateDialog(int id) {
-	    Dialog dialog;
+	    final Dialog dialog;
 	    switch(id) {
 	    case ABOUT_DIALOG_ID:
 	        // do the work to define the pause Dialog
 	    	dialog = new AboutDialog(this);
 	        break;
-	    /*case ERROR_DIALOG_ID:
-	    	dialog = new ErrorDialog();
-	    	break;*/
+	    case NO_LOCATOR_DIALOG_ID:
+	    	dialog = AlertDialogs.NoLocation(this);
+	    	break;
 	    default:
 	        dialog = null;
 	    }
 	    return dialog;
-	}
-	
-	
-	/**
-	 * Link 'Go' button to {@link GoToLocationGeocoderListener}.
-	 * @param tv the {@link AutoCompleteAddressTextView} to read address from.
-	 * @return
-	 */
-	private void setupGoButton(final BartlebyGeocoder geocoder, final AutoCompleteAddressTextView tv, final GoToLocationGeocoderListener listener) {
-		findViewById(R.id.button_lookup).setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				geocoder.lookup(tv.getText(), listener);
-			}
-		});
 	}
 }

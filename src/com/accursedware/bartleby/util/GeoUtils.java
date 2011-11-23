@@ -5,6 +5,7 @@
 package com.accursedware.bartleby.util;
 
 import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapView;
 
 import android.location.Location;
 
@@ -15,7 +16,7 @@ import android.location.Location;
  */
 public class GeoUtils {
 	
-	private static final String PROVIDER = "synthetic";
+	//private static final String PROVIDER = "synthetic";
 	/**
 	 * {@link GeoPoint} approximating NYC.  Real lat/long is:
 	 */
@@ -25,16 +26,8 @@ public class GeoUtils {
 	 * {@link Location} approximating NYC.<p>
 	 * 40.627307916989615 / -73.96820068359375
 	 */
-	public static final Location NYC = locationFromLatLon(40.627307916989615, -73.96820068359375);
+	//public static final Location NYC = locationFromLatLon(40.627307916989615, -73.96820068359375);
 	
-	/**
-	 * Obtain a {@link GeoPoint} from a {@link Location}.
-	 * @param location
-	 * @return
-	 */
-	public static GeoPoint geoPointFromLocation(Location location) {
-		return new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() *1E6));
-	}
 	
 	/**
 	 * Obtain a {@link Location} from a latitude and longitude.
@@ -42,11 +35,12 @@ public class GeoUtils {
 	 * @param lon
 	 * @return
 	 */
-	public static Location locationFromLatLon(double lat, double lon) {
+	/*public static Location locationFromLatLon(double lat, double lon) {
 		Location location = new Location(PROVIDER);
 		location.setLongitude(lon);
 		location.setLatitude(lat);
 		
 		return location;
-	}
+	}*/
+	
 }

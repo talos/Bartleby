@@ -18,12 +18,12 @@ import com.readystatesoftware.mapviewballoons.BalloonItemizedOverlay;
 import com.readystatesoftware.mapviewballoons.BalloonOverlayView;
 
 /**
- * An {@link ItemizedOverlay} that holds {@link BartlebyItem}s.
+ * An {@link ItemizedOverlay} that holds {@link Property}s.
  * @author john
  *
  */
-class BartlebyItemOverlay extends BalloonItemizedOverlay<BartlebyItem> {
-	private final List<BartlebyItem> items = new ArrayList<BartlebyItem>();
+class PropertyOverlay extends BalloonItemizedOverlay<Property> {
+	private final List<Property> items = new ArrayList<Property>();
 	private final Activity activity;
 	private final BartlebyScraper scraper;
 	
@@ -31,7 +31,7 @@ class BartlebyItemOverlay extends BalloonItemizedOverlay<BartlebyItem> {
 	 * 
 	 * @param marker The {@link Drawable} marker that will be used in the {@link ItemizedOverlay}.
 	 */
-	public BartlebyItemOverlay(Activity activity, Drawable marker, MapView mapView, BartlebyScraper scraper) {
+	public PropertyOverlay(Activity activity, Drawable marker, MapView mapView, BartlebyScraper scraper) {
 		super(boundCenter(marker), mapView);
 		setDrawFocusedItem(true);
 		//int the = android.R.drawable.ic_menu_search;
@@ -41,15 +41,15 @@ class BartlebyItemOverlay extends BalloonItemizedOverlay<BartlebyItem> {
 		populate();
 	}
 	
-	public void addItem(GeoPoint gp, ThreePartAddress address) {
-		BartlebyItem item = new BartlebyItem(gp, address);
+	public void addItem(BartlebyAddress address) {
+		Property item = new Property(address);
 	    items.add(item);
 	    populate();
 	    setFocus(item);
 	}
 	
 	@Override
-	protected BartlebyItem createItem(int i) {
+	protected Property createItem(int i) {
 		return items.get(i);
 	}
 	
@@ -59,7 +59,7 @@ class BartlebyItemOverlay extends BalloonItemizedOverlay<BartlebyItem> {
 	}
 	
 	@Override
-	protected BalloonOverlayView<BartlebyItem> createBalloonOverlayView() {
-		return new BartlebyBalloonOverlayView(activity, getBalloonBottomOffset(), scraper);
+	protected BalloonOverlayView<Property> createBalloonOverlayView() {
+		return new PropertyBalloonOverlayView(activity, getBalloonBottomOffset(), scraper);
 	}
 }

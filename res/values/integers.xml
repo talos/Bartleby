@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<!-- How many characters before beginning to autocomplete the searchview -->
     <item type="integer" format="integer" name="completion_threshold">5</item>
+    
+    <!-- How far to zoom in maps automatically towards current location -->
+    <item type="integer" format="integer" name="zoom_to_level">15</item>
 </resources>

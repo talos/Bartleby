@@ -37,7 +37,7 @@ import android.widget.TextView;
  * @author talos
  *
  */
-class BartlebyBalloonOverlayView extends BalloonOverlayView<BartlebyItem> {
+class PropertyBalloonOverlayView extends BalloonOverlayView<Property> {
 	/**
 	 * String searched for as key for relevant results.
 	 */
@@ -50,19 +50,19 @@ class BartlebyBalloonOverlayView extends BalloonOverlayView<BartlebyItem> {
 	private final ListView owners;
 	private final LinearLayout loading;
 	
-	private final Map<ThreePartAddress, String[]> ownersByAddress =
-			Collections.synchronizedMap(new HashMap<ThreePartAddress, String[]>());
+	private final Map<BartlebyAddress, String[]> ownersByAddress =
+			Collections.synchronizedMap(new HashMap<BartlebyAddress, String[]>());
 	
 	/**
 	 * The currently displayed address.
 	 */
-	private ThreePartAddress curAddress;
+	private BartlebyAddress curAddress;
 	
 	/**
 	 * @param context
 	 * @param balloonBottomOffset
 	 */
-	public BartlebyBalloonOverlayView(Activity activity, int balloonBottomOffset, BartlebyScraper scraper) {
+	public PropertyBalloonOverlayView(Activity activity, int balloonBottomOffset, BartlebyScraper scraper) {
 		super(activity, balloonBottomOffset);
 		
 		this.activity = activity;
@@ -86,10 +86,10 @@ class BartlebyBalloonOverlayView extends BalloonOverlayView<BartlebyItem> {
 	 * Override {@link #setData} to asynchronously populate balloon view.
 	 */
 	@Override
-	public void setData(BartlebyItem item) {
+	public void setData(Property item) {
 		super.setData(item);
 		
-		ThreePartAddress address = item.getAddress();
+		BartlebyAddress address = item.getAddress();
 		curAddress = address;
 		
 		title.setVisibility(VISIBLE);
@@ -98,7 +98,7 @@ class BartlebyBalloonOverlayView extends BalloonOverlayView<BartlebyItem> {
 		displaySnippetForAddress(address);
 	}
 	
-	private void displaySnippetForAddress(final ThreePartAddress address) {
+	private void displaySnippetForAddress(final BartlebyAddress address) {
 		
 		synchronized(ownersByAddress) {
 			
@@ -141,9 +141,9 @@ class BartlebyBalloonOverlayView extends BalloonOverlayView<BartlebyItem> {
 	 */
 	private class BartlebyBalloonOverlayItemScraperListener extends LogScraperListener {
 		
-		private final ThreePartAddress address;
+		private final BartlebyAddress address;
 		
-		BartlebyBalloonOverlayItemScraperListener(ThreePartAddress address) {
+		BartlebyBalloonOverlayItemScraperListener(BartlebyAddress address) {
 			super(new AndroidLogger(activity));
 			this.address = address;
 		}

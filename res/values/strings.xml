@@ -11,6 +11,10 @@
     <string name="crashed">No scrapers for address: you should write some!</string>
     
     <string name="no_package_info">Could not get package version info.</string>
+    <string name="no_location_service">There is no location service available.
+        Turn on a location service for better address autocompletion.</string>
+    <string name="no_addresses_for_query">No valid addresses found for %s.</string>
+    <string name="no_address_for_point">Can\'t find address.</string>
     
 	<string name="about_title">About Bartleby</string>
     <string-array name="about_paragraphs">

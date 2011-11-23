@@ -43,7 +43,7 @@ class BartlebyScraper {
 		this.rootURL = context.getString(R.string.root_url);
 	}
 	
-	public void scrape(ThreePartAddress address, ScraperListener listener) {
+	public void scrape(BartlebyAddress address, ScraperListener listener) {
 		Hashtable<String, String> input = new Hashtable<String, String>();
 		input.put(NUMBER, address.number);
 		input.put(STREET, address.street);
