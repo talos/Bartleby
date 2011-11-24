@@ -10,7 +10,7 @@
 ### 0.1.5
 
 - More elegantly handles clicks on autocomplete options.
-- Geocoder still works when no location manager is available.
+- App still works when no location manager is available.
 
 ### 0.1.4
 
