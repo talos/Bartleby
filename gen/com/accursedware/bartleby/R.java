@@ -29,23 +29,25 @@ public final class R {
         public static final int red_marker=0x7f020009;
     }
     public static final class id {
-        public static final int about=0x7f0a000d;
+        public static final int about=0x7f0a000c;
         public static final int about_text=0x7f0a0000;
         public static final int autocomplete_address=0x7f0a0009;
         public static final int balloon_inner_layout=0x7f0a0003;
         public static final int balloon_item_snippet=0x7f0a0005;
         public static final int balloon_item_title=0x7f0a0004;
         public static final int balloon_main_layout=0x7f0a0002;
-        public static final int button_lookup=0x7f0a000b;
         public static final int close_img_button=0x7f0a0006;
         public static final int loading=0x7f0a0007;
         public static final int mapview=0x7f0a000a;
         public static final int master=0x7f0a0008;
-        public static final int options=0x7f0a000e;
-        public static final int owners=0x7f0a000c;
+        public static final int options=0x7f0a000d;
+        public static final int owners=0x7f0a000b;
         public static final int version_text=0x7f0a0001;
     }
     public static final class integer {
+        /**  How many milliseconds to wait before updating autocomplete list. 
+         */
+        public static final int autocomplete_delay=0x7f060002;
         /**  How many characters before beginning to autocomplete the searchview 
          */
         public static final int completion_threshold=0x7f060000;
@@ -55,21 +57,21 @@ public final class R {
     }
     public static final class layout {
         public static final int about=0x7f030000;
-        public static final int autocomplete_item=0x7f030001;
-        public static final int balloon_overlay=0x7f030002;
-        public static final int caustic=0x7f030003;
-        public static final int loading=0x7f030004;
-        public static final int main=0x7f030005;
-        public static final int owner_item=0x7f030006;
-        public static final int owners=0x7f030007;
-        public static final int paragraph_item=0x7f030008;
+        public static final int about_paragraph=0x7f030001;
+        public static final int autocomplete=0x7f030002;
+        public static final int balloon_overlay=0x7f030003;
+        public static final int caustic=0x7f030004;
+        public static final int loading=0x7f030005;
+        public static final int main=0x7f030006;
+        public static final int owner=0x7f030007;
+        public static final int owners=0x7f030008;
     }
     public static final class menu {
         public static final int main=0x7f090000;
     }
     public static final class string {
         public static final int about=0x7f040003;
-        public static final int about_title=0x7f04000e;
+        public static final int about_title=0x7f04000f;
         public static final int address_hint=0x7f040005;
         public static final int app_name=0x7f040000;
         public static final int crashed=0x7f040009;
@@ -83,6 +85,7 @@ public final class R {
         public static final int loading=0x7f040007;
         public static final int no_address_for_point=0x7f04000d;
         public static final int no_addresses_for_query=0x7f04000c;
+        public static final int no_geocoder=0x7f04000e;
         public static final int no_location_service=0x7f04000b;
         public static final int no_package_info=0x7f04000a;
         public static final int options=0x7f040004;

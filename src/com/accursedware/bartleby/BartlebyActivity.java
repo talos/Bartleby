@@ -27,11 +27,12 @@ import com.google.android.maps.Overlay;
  * @author talos
  *
  */
-public class Bartleby extends MapActivity {
+public class BartlebyActivity extends MapActivity {
 	
 	private static final int ABOUT_DIALOG_ID = 0;
 	private static final int NO_LOCATOR_DIALOG_ID = 1;
 	
+	private AsyncGeocoder geocoder;
 	private Locator locator;
 	
 	/**
@@ -51,22 +52,19 @@ public class Bartleby extends MapActivity {
 		mapView.setBuiltInZoomControls(true);
 		locator = new Locator(this, mapView.getController());
 		
-		final AsyncGeocoder geocoder = new AsyncGeocoder(this);
-		
 		PropertyOverlay propertyOverlay = new PropertyOverlay(
 				this, getResources().getDrawable(R.drawable.marker), mapView, scraper);
+
+		geocoder = new AsyncGeocoder(this);
 		
 		// Set up the auto-complete address text view.
 		final AddressSearchView searchView = new AddressSearchView(this, geocoder,
 				(AutoCompleteTextView) findViewById(R.id.autocomplete_address),
 				mapView, propertyOverlay);
 		
-		// Set up lookup button to search for currently entered address.
-		new AddressSearchButton(this, geocoder, findViewById(R.id.button_lookup),
-				searchView, mapView, propertyOverlay);
-		
 		// This overlay catches all random clicks and creates new points.
-		FallThroughOverlay fallThrough = new FallThroughOverlay(this, geocoder, mapView.getController(),
+		FallThroughOverlay fallThrough = new FallThroughOverlay(this, geocoder,
+				mapView.getController(),
 				searchView, propertyOverlay);
 		
 		// Add the overlays.
@@ -77,17 +75,26 @@ public class Bartleby extends MapActivity {
 	
 	/**
 	 * When the application resumes, look up where we are now.  Let the user
-	 * know if we can't find out.
+	 * know if we can't find out.  Also, make sure to resume the geocoder.
 	 */
 	@Override
 	protected void onResume() {
 		super.onResume();
+		geocoder.resume(this);
 		try {
 			locator.locate(); // Pan to our current location.
 		} catch(NoLocationProvidersException e) {
 			showDialog(NO_LOCATOR_DIALOG_ID);
 		}
-		
+	}
+	
+	/**
+	 * When the application is paused, pause the geocoder.
+	 */
+	@Override
+	protected void onPause() {
+		super.onPause();
+		geocoder.pause();
 	}
 
 	/**

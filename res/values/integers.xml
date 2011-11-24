@@ -5,4 +5,7 @@
     
     <!-- How far to zoom in maps automatically towards current location -->
     <item type="integer" format="integer" name="zoom_to_level">15</item>
+    
+    <!-- How many milliseconds to wait before updating autocomplete list. -->
+    <item type="integer" format="integer" name="autocomplete_delay">1000</item>
 </resources>

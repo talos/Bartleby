@@ -32,7 +32,7 @@ class AboutDialog extends Dialog {
     	String[] about_paragraphs = activity.getResources().getStringArray(R.array.about_paragraphs);
     	
     	ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity,
-    			R.layout.paragraph_item, about_paragraphs);
+    			R.layout.about_paragraph, about_paragraphs);
     	ListView text = (ListView) findViewById(R.id.about_text);
     	text.setAdapter(adapter);
     	

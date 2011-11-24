@@ -17,7 +17,10 @@ import com.google.android.maps.MapView;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.Looper;
+import android.test.IsolatedContext;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Nonblocking {@link Geocoder} using {@link AsyncGeocoderListener}.
@@ -42,15 +45,14 @@ public final class AsyncGeocoder {
 	 */
 	private static final int MAX_RESULTS = 4;
 	//private final Context context;
-	private final Geocoder geocoder;
-	//private final MapView mapView;
+	private Geocoder geocoder;
+	private boolean paused = false;
+	
 	private final ExecutorService worker = Executors.newSingleThreadExecutor();
 	private Future<?> lastSearch;
 	
 	public AsyncGeocoder(Context context) {
-		//this.context = context;
-		this.geocoder = new Geocoder(context);
-		//this.mapView = mapView;
+		resume(context);
 	}
 	
 	/**
@@ -64,6 +66,9 @@ public final class AsyncGeocoder {
 	public void lookup(final String locationName,
 			final AsyncGeocoderListener listener,
 			final MapView mapView) {
+		if(paused == true) {
+			return;
+		}
 		cancelLastSearch();
 		lastSearch = worker.submit(new Runnable() {
 			public void run() {
@@ -76,9 +81,10 @@ public final class AsyncGeocoder {
 					double centerLat = center.getLatitudeE6() / 1E6;
 					double centerLon = center.getLongitudeE6() / 1E6;
 
-					double latSpan = mapView.getLatitudeSpan() / 1E6;
-					double lonSpan = mapView.getLongitudeSpan() / 1E6;
-					
+					// TODO logarithmic progression
+					double latSpan = 3 * mapView.getLatitudeSpan() / 1E6;
+					double lonSpan = 3 * mapView.getLongitudeSpan() / 1E6;
+
 					double llLat = centerLat - latSpan;
 					double llLon = centerLon - lonSpan;
 					double urLat = centerLat + latSpan;
@@ -120,6 +126,9 @@ public final class AsyncGeocoder {
 	 * @param listener
 	 */
 	public void lookup(final double latitude, final double longitude, final AsyncReverseGeocoderListener listener) {
+		if(paused == true) {
+			return;
+		}
 		cancelLastSearch();
 		lastSearch = worker.submit(new Runnable() {
 			public void run() {
@@ -137,6 +146,29 @@ public final class AsyncGeocoder {
 				}
 			}
 		});
+	}
+	
+	/**
+	 * Resume the geocoder.
+	 * @param context
+	 */
+	public void resume(Context context) {
+		if(geocoder == null) {
+			geocoder = new Geocoder(context);
+		}
+		paused = false;
+	}
+	
+	/**
+	 * Pause the geocoder.  This will destroy the backing geocoder and cancel the current
+	 * search.  Any calls to {@link #lookup(double, double, AsyncReverseGeocoderListener)}
+	 * or {@link #lookup(String, AsyncGeocoderListener, MapView)} will be ignored until
+	 * {@link #resume(Context)} is called.
+	 */
+	public void pause() {
+		cancelLastSearch();
+		geocoder = null;
+		paused = true;
 	}
 	
 	/**

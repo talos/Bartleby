@@ -113,13 +113,11 @@ class PropertyBalloonOverlayView extends BalloonOverlayView<Property> {
 							// Might it be more efficient to store ArrayAdapters directly in 
 							// ownersByAddress?
 							ArrayAdapter<String> adapter =
-									new ArrayAdapter<String>(activity, R.layout.owner_item,
+									new ArrayAdapter<String>(activity, R.layout.owner,
 											ownersByAddress.get(address));
 							owners.setAdapter(adapter);
 							owners.setVisibility(VISIBLE);
 							loading.setVisibility(GONE);
-							//snippet.setText(StringUtils.join(snippets.get(address), ", "));
-							//snippet.setVisibility(View.VISIBLE);
 						}
 					}
 				});

@@ -1,5 +1,12 @@
 # Bartleby versions
 
+### 0.1.6
+
+- Eliminated search button.
+- Timer to avoid excess geocoder lookups on autofill.
+- Geocoder shuts down and restarts on pause/resume.
+- Toast messages on errors.
+
 ### 0.1.5
 
 - More elegantly handles clicks on autocomplete options.

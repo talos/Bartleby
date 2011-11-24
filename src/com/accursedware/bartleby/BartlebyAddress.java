@@ -12,6 +12,7 @@ import java.util.List;
 import com.google.android.maps.GeoPoint;
 
 import android.location.Address;
+import android.util.Log;
 
 /**
  * An address with a street number,
@@ -24,19 +25,20 @@ import android.location.Address;
 public final class BartlebyAddress {
 	public final String number;
 	public final String street;
-	
 	public final String zip;
 	
 	private final GeoPoint geoPoint;
+	private final String asString;
 	
 	/**
 	 * Optional, only used in {@link #toString()}
 	 */
-	private final String city;
+	//private final String city;
 
 	public BartlebyAddress(Address address) throws BartlebyAddressException {
 		
-		// To create a BartlebyAddress, we must have a thoroughfare, postal code
+		// To create a BartlebyAddress, we must have a thoroughfare, postal code,
+		// and valid point on map.
 		if(address.getThoroughfare() == null || 
 				address.getPostalCode() == null ||
 				!address.hasLatitude() || 
@@ -44,9 +46,13 @@ public final class BartlebyAddress {
 			throw new BartlebyAddressException(address);
 		}
 		
-		String locality = address.getLocality();
-		String premises = address.getPremises();
-		this.city = locality == null ? premises : locality;
+		// Calculate the string representation
+		StringBuilder sb = new StringBuilder();
+		int numLines = address.getMaxAddressLineIndex();
+		for(int i = 0 ; i < numLines ; i++) {
+			sb.append(address.getAddressLine(i)).append(", ");
+		}
+		asString = sb.substring(0, sb.length() - 2); // cut out trailing comma
 		
 		this.geoPoint = new GeoPoint((int) (address.getLatitude() * 1E6),
 									(int) (address.getLongitude() * 1E6));
@@ -102,8 +108,7 @@ public final class BartlebyAddress {
 	
 	@Override
 	public String toString() {
-		return number + ' ' + street + ", " +
-				(city == null ? "" : city + ", ") + zip;
+		return asString;
 	}
 	
 	/**

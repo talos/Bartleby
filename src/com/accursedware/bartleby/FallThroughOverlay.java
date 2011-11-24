@@ -41,10 +41,10 @@ class FallThroughOverlay extends Overlay {
 			 * Display message if no addresses can be found at clicked point.
 			 */
 			@Override
-			public void onNoAddressesFound(GeoPoint point) {
+			public void onNoAddressesFound(final GeoPoint point) {
 				activity.runOnUiThread(new Runnable() {
 					public void run() {
-						Toast.makeText(activity, activity.getString(R.string.no_address_for_point), Toast.LENGTH_SHORT);
+						Toasts.showNoAddressFound(activity, point);
 					}
 				});
 			}
@@ -64,6 +64,7 @@ class FallThroughOverlay extends Overlay {
 			@Override
 			public void onError(IOException e) {
 				e.printStackTrace();
+				Toasts.showGeocoderError(activity);
 			}
 		};
 	}
