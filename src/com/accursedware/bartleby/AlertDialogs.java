@@ -31,6 +31,20 @@ class AlertDialogs {
 	/**
 	 * 
 	 * @param context
+	 * @return An {@link AlertDialog} that lets the user know that there is
+	 * no internet available.
+	 */
+	static AlertDialog NoInternet(Context context) {
+		AlertDialog.Builder builder = getBuilder(context);
+		builder.setMessage(context.getString(R.string.no_internet_service));
+		AlertDialog dialog = builder.create();
+		dialog.setCanceledOnTouchOutside(true);
+		return dialog;
+	}
+	
+	/**
+	 * 
+	 * @param context
 	 * @return The {@link AlertDialog.Builder} for this <code>context</code>
 	 */
 	private static AlertDialog.Builder getBuilder(Context context) {

@@ -1,5 +1,12 @@
 # Bartleby versions
 
+### 0.1.7
+
+- Updated to keep up with new Caustic listener features
+- Only executes load instructions for owner
+- Provides notification if there is a missing network
+- Actually attempts to use Locator
+
 ### 0.1.6
 
 - Eliminated search button.

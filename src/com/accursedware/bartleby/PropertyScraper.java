@@ -17,7 +17,7 @@ import net.caustic.log.AndroidLogger;
  * @author talos
  *
  */
-class BartlebyScraper {
+class PropertyScraper {
 	/**
 	 * How many threads to use when scraping.
 	 */
@@ -33,7 +33,7 @@ class BartlebyScraper {
 	 */
 	private final String rootURL;
 	
-	public BartlebyScraper(Context context) {
+	public PropertyScraper(Context context) {
 		this.scraper = new Scraper(NUM_THREADS);
 		
 		// if we're in debug mode, log things.

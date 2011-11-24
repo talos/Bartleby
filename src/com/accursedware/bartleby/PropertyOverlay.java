@@ -25,16 +25,15 @@ import com.readystatesoftware.mapviewballoons.BalloonOverlayView;
 class PropertyOverlay extends BalloonItemizedOverlay<Property> {
 	private final List<Property> items = new ArrayList<Property>();
 	private final Activity activity;
-	private final BartlebyScraper scraper;
+	private final PropertyScraper scraper;
 	
 	/**
 	 * 
 	 * @param marker The {@link Drawable} marker that will be used in the {@link ItemizedOverlay}.
 	 */
-	public PropertyOverlay(Activity activity, Drawable marker, MapView mapView, BartlebyScraper scraper) {
+	public PropertyOverlay(Activity activity, Drawable marker, MapView mapView, PropertyScraper scraper) {
 		super(boundCenter(marker), mapView);
 		setDrawFocusedItem(true);
-		//int the = android.R.drawable.ic_menu_search;
 		this.scraper = scraper;
 		this.activity = activity;
 		
@@ -60,6 +59,6 @@ class PropertyOverlay extends BalloonItemizedOverlay<Property> {
 	
 	@Override
 	protected BalloonOverlayView<Property> createBalloonOverlayView() {
-		return new PropertyBalloonOverlayView(activity, getBalloonBottomOffset(), scraper);
+		return new PropertyBalloon(activity, getBalloonBottomOffset(), scraper);
 	}
 }

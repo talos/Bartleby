@@ -39,6 +39,9 @@ class Locator {
 	 * @throws NoLocationProvidersException if there are no location providers available.
 	 */
 	void locate() throws NoLocationProvidersException {
+		boolean gpsEnabled = false;
+		boolean networkEnabled = false;
+		
 		LocationListener listener = new LocationListener() {
 			
 			@Override
@@ -63,23 +66,25 @@ class Locator {
 
 		// Prefer the use of GPS.
 		try {
-			lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-			lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
-			return; // exit out early.
+			if(gpsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+				lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
+			}
 		} catch(SecurityException e) {
 			// we can safely ignore this.
 		}
 		
 		// Fall back to use of network.
 		try {
-			lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-			lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, listener);
-			return;
+			if(networkEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+				lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, listener);
+			}
 		} catch(SecurityException e){
 			// we can safely ignore this.
 		}
 		
-		throw new NoLocationProvidersException();
+		if(!gpsEnabled && !networkEnabled) {
+			throw new NoLocationProvidersException();
+		}
 	}
 }
 

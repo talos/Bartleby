@@ -19,6 +19,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import com.accursedware.bartleby.geocoding.AsyncGeocoder;
+import com.accursedware.bartleby.util.NetworkUtils;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
@@ -31,6 +32,7 @@ public class BartlebyActivity extends MapActivity {
 	
 	private static final int ABOUT_DIALOG_ID = 0;
 	private static final int NO_LOCATOR_DIALOG_ID = 1;
+	private static final int NO_INTERNET_DIALOG_ID = 2;
 	
 	private AsyncGeocoder geocoder;
 	private Locator locator;
@@ -45,7 +47,7 @@ public class BartlebyActivity extends MapActivity {
 		// Inflate main layout.
 		setContentView(R.layout.main);
 		
-		BartlebyScraper scraper = new BartlebyScraper(this);
+		PropertyScraper scraper = new PropertyScraper(this);
 		
 		// Set up the mapView.
 		MapView mapView = (MapView) findViewById(R.id.mapview);
@@ -54,7 +56,7 @@ public class BartlebyActivity extends MapActivity {
 		
 		PropertyOverlay propertyOverlay = new PropertyOverlay(
 				this, getResources().getDrawable(R.drawable.marker), mapView, scraper);
-
+		
 		geocoder = new AsyncGeocoder(this);
 		
 		// Set up the auto-complete address text view.
@@ -81,6 +83,10 @@ public class BartlebyActivity extends MapActivity {
 	protected void onResume() {
 		super.onResume();
 		geocoder.resume(this);
+		if(!NetworkUtils.isNetworkAvailable(this)) {
+			showDialog(NO_INTERNET_DIALOG_ID);
+		}
+		
 		try {
 			locator.locate(); // Pan to our current location.
 		} catch(NoLocationProvidersException e) {
@@ -133,6 +139,9 @@ public class BartlebyActivity extends MapActivity {
 	        break;
 	    case NO_LOCATOR_DIALOG_ID:
 	    	dialog = AlertDialogs.NoLocation(this);
+	    	break;
+	    case NO_INTERNET_DIALOG_ID:
+	    	dialog = AlertDialogs.NoInternet(this);
 	    	break;
 	    default:
 	        dialog = null;

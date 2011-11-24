@@ -71,7 +71,7 @@ public final class R {
     }
     public static final class string {
         public static final int about=0x7f040003;
-        public static final int about_title=0x7f04000f;
+        public static final int about_title=0x7f040010;
         public static final int address_hint=0x7f040005;
         public static final int app_name=0x7f040000;
         public static final int crashed=0x7f040009;
@@ -83,9 +83,10 @@ public final class R {
          */
         public static final int google_maps_api_key_disabled=0x7f040001;
         public static final int loading=0x7f040007;
-        public static final int no_address_for_point=0x7f04000d;
-        public static final int no_addresses_for_query=0x7f04000c;
-        public static final int no_geocoder=0x7f04000e;
+        public static final int no_address_for_point=0x7f04000e;
+        public static final int no_addresses_for_query=0x7f04000d;
+        public static final int no_geocoder=0x7f04000f;
+        public static final int no_internet_service=0x7f04000c;
         public static final int no_location_service=0x7f04000b;
         public static final int no_package_info=0x7f04000a;
         public static final int options=0x7f040004;

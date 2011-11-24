@@ -11,8 +11,9 @@
     <string name="crashed">No scrapers for address: you should write some!</string>
     
     <string name="no_package_info">Could not get package version info.</string>
-    <string name="no_location_service">There is no location service available.
+    <string name="no_location_service">You have disabled all location services.
         Turn on a location service for better address autocompletion.</string>
+    <string name="no_internet_service">You do not have access to the Internet.</string>
     <string name="no_addresses_for_query">No valid addresses found for "<i>%s</i>".</string>
     <string name="no_address_for_point">Can\'t find address.</string>
     <string name="no_geocoder">No geocoder available.</string>

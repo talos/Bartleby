@@ -23,6 +23,7 @@ import net.caustic.scope.Scope;
 import net.caustic.util.StringUtils;
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -37,7 +38,7 @@ import android.widget.TextView;
  * @author talos
  *
  */
-class PropertyBalloonOverlayView extends BalloonOverlayView<Property> {
+class PropertyBalloon extends BalloonOverlayView<Property> {
 	/**
 	 * String searched for as key for relevant results.
 	 */
@@ -45,7 +46,7 @@ class PropertyBalloonOverlayView extends BalloonOverlayView<Property> {
 	
 	private final Activity activity;
 	private final TextView title;
-	private final BartlebyScraper scraper;
+	private final PropertyScraper scraper;
 	private final LinearLayout innerLayout;
 	private final ListView owners;
 	private final LinearLayout loading;
@@ -62,7 +63,7 @@ class PropertyBalloonOverlayView extends BalloonOverlayView<Property> {
 	 * @param context
 	 * @param balloonBottomOffset
 	 */
-	public PropertyBalloonOverlayView(Activity activity, int balloonBottomOffset, BartlebyScraper scraper) {
+	public PropertyBalloon(Activity activity, int balloonBottomOffset, PropertyScraper scraper) {
 		super(activity, balloonBottomOffset);
 		
 		this.activity = activity;
@@ -127,7 +128,7 @@ class PropertyBalloonOverlayView extends BalloonOverlayView<Property> {
 				// loading icon.
 				owners.setVisibility(GONE);
 				loading.setVisibility(VISIBLE);
-				scraper.scrape(address, new BartlebyBalloonOverlayItemScraperListener(address));
+				scraper.scrape(address, new PropertyScraperListener(address));
 			}
 		}
 	}
@@ -137,21 +138,22 @@ class PropertyBalloonOverlayView extends BalloonOverlayView<Property> {
 	 * @author talos
 	 *
 	 */
-	private class BartlebyBalloonOverlayItemScraperListener extends LogScraperListener {
+	private class PropertyScraperListener extends LogScraperListener {
 		
 		private final BartlebyAddress address;
 		
-		BartlebyBalloonOverlayItemScraperListener(BartlebyAddress address) {
+		PropertyScraperListener(BartlebyAddress address) {
 			super(new AndroidLogger(activity));
 			this.address = address;
 		}
 		
 		@Override
-		public void onReady(Instruction instruction, Database db, Scope scope,
+		public void onReady(Instruction instruction, String name, Database db, Scope scope,
 				Scope parent, String source, HttpBrowser browser, Runnable start) {
 			
-			// TODO: this auto-scrapes children.
-			start.run();
+			if(name.contains(OWNER)) {
+				start.run();
+			}
 		}
 		
 		@Override
