@@ -8,7 +8,6 @@ import java.io.IOException;
 
 import android.app.Activity;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.accursedware.bartleby.geocoding.AsyncGeocoder;
 import com.accursedware.bartleby.geocoding.AsyncReverseGeocoderListener;
@@ -27,6 +26,11 @@ import com.google.android.maps.Overlay;
 class FallThroughOverlay extends Overlay {
 
 	private final AsyncGeocoder geocoder;
+	
+	/**
+	 * This {@link AsyncReverseGeocoderListener} will listen for the completion
+	 * of reverse geocodes, and throw addresses as properties on the map.
+	 */
 	private final AsyncReverseGeocoderListener listener;
 	
 	public FallThroughOverlay(final Activity activity,
@@ -42,11 +46,7 @@ class FallThroughOverlay extends Overlay {
 			 */
 			@Override
 			public void onNoAddressesFound(final GeoPoint point) {
-				activity.runOnUiThread(new Runnable() {
-					public void run() {
-						Toasts.showNoAddressFound(activity, point);
-					}
-				});
+				Toasts.showNoAddressFound(activity, point);
 			}
 			
 			
@@ -63,16 +63,18 @@ class FallThroughOverlay extends Overlay {
 			
 			@Override
 			public void onError(IOException e) {
-				e.printStackTrace();
 				Toasts.showGeocoderError(activity);
+				e.printStackTrace();
 			}
 		};
 	}
 	
+	/**
+	 * Hit {@link #geocoder} with the point the user tapped.
+	 */
 	@Override
 	public boolean onTap(GeoPoint gp, MapView mapView) {		
 		geocoder.lookup(gp.getLatitudeE6() /1E6, gp.getLongitudeE6() / 1E6, listener);
-		
 		return true;
 	}
 }

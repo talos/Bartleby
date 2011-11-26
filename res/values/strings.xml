@@ -17,6 +17,7 @@
     <string name="no_addresses_for_query">No valid addresses found for "<i>%s</i>".</string>
     <string name="no_address_for_point">Can\'t find address.</string>
     <string name="no_geocoder">No geocoder available.</string>
+    <string name="no_server">No Caustic template server available.</string>
     
 	<string name="about_title">About Bartleby</string>
     <string-array name="about_paragraphs">

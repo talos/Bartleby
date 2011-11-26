@@ -1,5 +1,12 @@
 # Bartleby versions
 
+### 0.1.8
+
+- ServerPinger to provide some feedback over whether
+  the caustic server itself is available
+- Fixed UI thread bug with toasts, they should always
+  be appearing now.
+
 ### 0.1.7
 
 - Updated to keep up with new Caustic listener features

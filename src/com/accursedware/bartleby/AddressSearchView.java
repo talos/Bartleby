@@ -19,8 +19,10 @@ import android.app.Activity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -36,6 +38,8 @@ import android.widget.Toast;
 final class AddressSearchView {
 	private final AutoCompleteTextView tv;
 	
+	private boolean hasFocus = false;
+	
 	/**
 	 * The last real {@link BartlebyAddress} picked from the adapter.
 	 */
@@ -47,6 +51,7 @@ final class AddressSearchView {
 			final MapView map,
 			final PropertyOverlay overlay) {
 		this.tv = tv;
+		
 		//tv.setSelectAllOnFocus(true); // this should be set through the XML, too
 		/*
 		 * A {@link BartlebyGeocoderListener} that updates the array adapter when results are found.
@@ -165,16 +170,39 @@ final class AddressSearchView {
 		/*
 		 * Clear text when clicked.
 		 */
+		
+		/*
+		 * Select all text if clicked when focus changed, do nothing otherwise.
+		 */
 		tv.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				//tv.showDropDown();
-				tv.setText("");
+				//tv.setText("");
 				//tv.clearComposingText();
 				//tv.selectAll();
+				//if(hasFocus == false) {
+					tv.selectAll();
+				//	hasFocus = true;
+				//}
 			}
 		});
+		
+		/*
+		 * Revert hasFocus to <code>false</code> no matter what -- it is set to
+		 * <code>true</code> from a Click event.
+		 */
+		/*tv.setOnFocusChangeListener(new OnFocusChangeListener() {
+			
+			@Override
+			public void onFocusChange(View v, boolean hf) {
+				Log.i("bartleby", "lost focus");
+				hasFocus = false;
+			}
+		});*/
+		
+		//tv.set
 	}
 	
 	/**
@@ -182,7 +210,7 @@ final class AddressSearchView {
 	 * @param address
 	 */
 	public void setText(BartlebyAddress address) {
-		this.tv.setText(address.toString());
+		tv.setText(address.toString());
 	}
 	
 	/**
@@ -190,6 +218,7 @@ final class AddressSearchView {
 	 * @return The currently entered text.
 	 */
 	public String getText() {
-		return this.tv.getText().toString();
+		return tv.getText().toString();
 	}
+	
 }

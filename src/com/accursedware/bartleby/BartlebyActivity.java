@@ -6,9 +6,12 @@ package com.accursedware.bartleby;
 
 import java.util.List;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,6 +20,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.accursedware.bartleby.geocoding.AsyncGeocoder;
 import com.accursedware.bartleby.util.NetworkUtils;
@@ -35,6 +39,7 @@ public class BartlebyActivity extends MapActivity {
 	private static final int NO_INTERNET_DIALOG_ID = 2;
 	
 	private AsyncGeocoder geocoder;
+	private ServerPinger pinger;
 	private Locator locator;
 	
 	/**
@@ -59,6 +64,23 @@ public class BartlebyActivity extends MapActivity {
 		
 		geocoder = new AsyncGeocoder(this);
 		
+		// Set up the server pinger.
+		final Activity activity = this;
+		pinger = new ServerPinger(getString(R.string.root_url), new ServerPingerListener() {
+			@Override
+			public boolean onAlive() {
+				return false; // stop making requests if the server is alive.
+			}
+
+			@Override
+			public boolean onDead() {
+				Toasts.showNoServerError(activity);
+				
+				return true; // keep making requests
+			}
+			
+		});
+		
 		// Set up the auto-complete address text view.
 		final AddressSearchView searchView = new AddressSearchView(this, geocoder,
 				(AutoCompleteTextView) findViewById(R.id.autocomplete_address),
@@ -82,6 +104,7 @@ public class BartlebyActivity extends MapActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		pinger.ping();
 		geocoder.resume(this);
 		if(!NetworkUtils.isNetworkAvailable(this)) {
 			showDialog(NO_INTERNET_DIALOG_ID);
@@ -100,6 +123,7 @@ public class BartlebyActivity extends MapActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		pinger.stop();
 		geocoder.pause();
 	}
 

@@ -25,6 +25,7 @@
 			android:layout_alignParentTop="true"
 			android:layout_alignParentRight="true"></ImageButton> -->
 	<com.google.android.maps.MapView android:layout_height="wrap_content"
+			android:focusable="true"
 			android:clickable="true"
 			android:id="@+id/mapview"
 			android:layout_width="fill_parent"
