@@ -6,6 +6,7 @@ package com.accursedware.bartleby;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,6 +16,7 @@ import net.caustic.Request;
 import net.caustic.Response;
 import net.caustic.Scraper;
 import net.caustic.http.Cookies;
+import net.caustic.http.HashtableCookies;
 import net.caustic.log.Loggable;
 import net.caustic.log.Logger;
 import net.caustic.log.MultiLog;
@@ -48,7 +50,14 @@ public class BartlebyRequester implements Loggable {
 	
 	public void request(BartlebyAddress address) {
 		String id = address.getID().toString();
-		request(id, StringUtils.quote(rootURL.resolve(address.getPath()).toString()),
+		
+		// TODO: shouldn't hit sqlite on UI thread
+		Map<String, String> addressData = address.getMap();
+		for(Map.Entry<String, String> entry : addressData.entrySet()) {
+			db.saveData(id, entry.getKey(), entry.getValue());
+		}
+		
+		request(id, rootURL.resolve(address.getPath()).toString(),
 				"", null, true); // immediately force load on these.
 	}
 

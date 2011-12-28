@@ -31,7 +31,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 class Database extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "bartleby";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 4;
 	
 	private static final String DATA = "data";
 	private static final String RELATIONSHIPS = "relationships";
@@ -81,6 +81,7 @@ class Database extends SQLiteOpenHelper {
 				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				SCOPE       + " VARCHAR, " +
 				INSTRUCTION + " VARCHAR, " +
+				DESCRIPTION + " VARCHAR, " +
 				URI         + " VARCHAR)");
 
 		// retry table
@@ -88,6 +89,7 @@ class Database extends SQLiteOpenHelper {
 				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				SCOPE        + " VARCHAR, " +
 				INSTRUCTION  + " VARCHAR, " +
+				INPUT        + " VARCHAR, " +
 				URI          + " VARCHAR, " +
 				MISSING_TAGS + " VARCHAR)");
 
@@ -202,6 +204,7 @@ class Database extends SQLiteOpenHelper {
 			waits.put(name, new Request(scope, instruction, uri, null,
 					new CollectionStringMap(getData(scope)), getCookies(scope), true));
 		}
+		cursor.close();
 		return waits;
 	}
 	
@@ -245,6 +248,7 @@ class Database extends SQLiteOpenHelper {
 				result.add(new Request(scope, instruction, uri, input, tags, cookies, false));
 			}
 		}
+		cursor.close();
 		
 		return result;
 	}
@@ -291,6 +295,7 @@ class Database extends SQLiteOpenHelper {
 			}
 			child.put(scope, value);
 		}
+		cursor.close();
 		
 		return result;
 	}
@@ -305,7 +310,9 @@ class Database extends SQLiteOpenHelper {
 				SCOPE + " = ?", new String[] { scope },
 				null, null, null);
 		
-		return cursor.moveToFirst() ? cursor.getString(0) : null;
+		String source = cursor.moveToFirst() ? cursor.getString(0) : null;
+		cursor.close();
+		return source;
 	}
 	
 	Cookies getCookies(String scope) {
@@ -330,6 +337,7 @@ class Database extends SQLiteOpenHelper {
 			String host = cursor.getString(0);
 			cookies.add(host, cursor.getString(1));
 		}
+		cursor.close();
 		return cookies;
 	}
 	
@@ -344,6 +352,7 @@ class Database extends SQLiteOpenHelper {
 		while(cursor.moveToNext()) {
 			data.put(cursor.getString(0), cursor.getString(1));
 		}
+		cursor.close();
 		
 		return data;
 	}

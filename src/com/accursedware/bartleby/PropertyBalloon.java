@@ -37,6 +37,7 @@ class PropertyBalloon extends BalloonOverlayView<Property> implements DatabaseLi
 	public PropertyBalloon(Activity activity, int balloonBottomOffset, BartlebyRequester requester,
 			Database db) {
 		super(activity, balloonBottomOffset);
+		db.addListener(this);
 		
 		this.activity = activity;
 		this.requester = requester;
