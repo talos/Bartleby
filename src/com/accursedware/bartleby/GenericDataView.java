@@ -4,6 +4,9 @@
  */
 package com.accursedware.bartleby;
 
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -22,19 +25,23 @@ class GenericDataView implements DatabaseListener {
 	private final TextView title;
 	private final ListView data;
 	private final BartlebyRequester requester;
+	//private final ScrollView view;
+	private final LinearLayout view;
 	
-	GenericDataView(Database db, BartlebyRequester requester, ScrollView genericDataView) {
+	GenericDataView(Database db, BartlebyRequester requester, ViewGroup parent) {
 		this.db = db;
 		this.db.addListener(this);
 		
-		this.title = (TextView) genericDataView.findViewById(R.id.title);
-		this.data = (ListView) genericDataView.findViewById(R.id.data);
-		this.requester = requester;
+		//view = (ScrollView) View.inflate(parent.getContext(), R.layout.generic_data_view, parent);
+		view = (LinearLayout) View.inflate(parent.getContext(), R.layout.generic_data_view, parent);
 		
+		this.title = (TextView) view.findViewById(R.id.title);
+		this.data = (ListView) view.findViewById(R.id.data);
+		this.requester = requester;
 	}
 
+	@Override
 	public void updated(String updatedScope) {
-		
 		if(scope != null) {
 			if(scope.equals(updatedScope)) {
 				redraw();
@@ -42,10 +49,16 @@ class GenericDataView implements DatabaseListener {
 		}
 	}
 	
-	void setScope(String scope) {
+//	ScrollView getUnderlyingView() {
+	LinearLayout getUnderlyingView() {
+		return view;
+	}
+	
+	void setScope(String scope, String title) {
 		if(!this.scope.equals(scope)) {
 			this.scope = scope;
 			redraw();
+			this.title.setText(title);
 		}
 	}
 	

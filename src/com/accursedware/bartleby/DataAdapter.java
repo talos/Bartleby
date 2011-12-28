@@ -13,11 +13,8 @@ import android.content.Context;
 import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 
 final class DataAdapter implements ListAdapter {
 
@@ -92,7 +89,6 @@ final class DataAdapter implements ListAdapter {
 		final Context context = parent.getContext();
 		
 		final LinearLayout row;
-		final TextView nameView;
 		switch(type) {
 		case DATA_ROW:
 			row = DataRow.initialize(context, parent, name, data.get(name));

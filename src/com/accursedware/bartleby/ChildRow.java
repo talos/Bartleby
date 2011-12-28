@@ -23,20 +23,22 @@ class ChildRow {
 		TextView valueView = (TextView) view.findViewById(R.id.value);
 		valueView.setText(value);
 		ImageButton goToChildButton = (ImageButton) view.findViewById(R.id.go_to_child_button);
-		goToChildButton.setOnClickListener(new Listener(dataView, childID));
+		goToChildButton.setOnClickListener(new Listener(dataView, childID, value));
 		return view;
 	}
 	
 	private static class Listener implements OnClickListener {
 		private final GenericDataView dataView;
 		private final String childID;
-		private Listener(GenericDataView dataView, String childID) {
+		private final String value;
+		private Listener(GenericDataView dataView, String childID, String value) {
 			this.dataView = dataView;
 			this.childID = childID;
+			this.value = value;
 		}
 		@Override
 		public void onClick(View v) {
-			dataView.setScope(childID);
+			dataView.setScope(childID, value);
 		}
 	}
 }

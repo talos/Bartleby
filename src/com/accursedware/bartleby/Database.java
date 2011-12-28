@@ -1,5 +1,5 @@
 /**
- * Bartleby Android
+_ * Bartleby Android
  * A project to enable public access to public building information.
  */
 package com.accursedware.bartleby;
@@ -63,28 +63,24 @@ class Database extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		// relationship table
-		db.execSQL("CREATE TABLE ? IF NOT EXISTS (? VARCHAR, ? VARCHAR)",
-				new String[] { RELATIONSHIPS, SOURCE, SCOPE, NAME } );
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + RELATIONSHIPS +
+				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " + SOURCE + " VARCHAR, " + SCOPE + " VARCHAR, " + NAME + " VARCHAR, " + VALUE + " VARCHAR)");
 		
 		// data table
-		db.execSQL("CREATE TABLE ? IF NOT EXISTS (? VARCHAR, ? VARCHAR, ? VARCHAR)",
-				new String[] { DATA, SCOPE, NAME, VALUE } );
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + DATA +
+				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " + SCOPE + " VARCHAR, " + NAME + " VARCHAR, " + VALUE + " VARCHAR)");
 		
 		// wait table
-		db.execSQL("CREATE TABLE ? IF NOT EXISTS (? VARCHAR, ? VARCHAR, ? VARCHAR)",
-				new String[] { WAIT, SCOPE, INSTRUCTION, URI } );
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + WAIT +
+				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " + SCOPE + " VARCHAR, " + INSTRUCTION + " VARCHAR, " + URI + " VARCHAR)");
 
 		// retry table
-		db.execSQL("CREATE TABLE ? IF NOT EXISTS (? VARCHAR, ? VARCHAR, ? VARCHAR, ? VARCHAR)",
-				new String[] { RETRY, SCOPE, INSTRUCTION, URI, MISSING_TAGS } );
-		
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + RETRY +
+				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " + SCOPE + " VARCHAR, " + INSTRUCTION + " VARCHAR, " + URI + " VARCHAR, " + MISSING_TAGS + "VARCHAR)");
+
 		// cookies (browser state) table
-		db.execSQL("CREATE TABLE ? IF NOT EXISTS (? VARCHAR, ? VARCHAR, ? VARCHAR)",
-				new String[] { COOKIES, SCOPE, HOST, COOKIE } );
-		
-		// addresses table
-		/*db.execSQL("CREATE TABLE ? IF NOT EXISTS (? VARCHAR, ? VARCHAR)",
-				new String[] { ADDRESSES, SCOPE, ADDRESS } );*/
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + COOKIES +
+				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " + SCOPE + " VARCHAR, " + HOST + " VARCHAR, " + COOKIE + "VARCHAR)");
 	}
 	
 	@Override
@@ -95,13 +91,6 @@ class Database extends SQLiteOpenHelper {
 	void addListener(DatabaseListener listener) {
 		listeners.add(listener);
 	}
-	/*
-	void saveAddress(String scope, String address) {
-		ContentValues cv = new ContentValues(2);
-		cv.put(SCOPE, scope);
-		cv.put(ADDRESS, address);
-		db.insert(ADDRESSES, null, cv);
-	}*/
 	
 	void saveData(String scope, String name, String value) {
 		ContentValues cv = new ContentValues(3);
@@ -165,7 +154,7 @@ class Database extends SQLiteOpenHelper {
 	 */
 	Map<String, Request> getWait(String scope) {
 		Cursor cursor = db.query(WAIT, new String[] { INSTRUCTION, URI, DESCRIPTION }, 
-				"? = ?", new String[] { SCOPE, scope },
+				SCOPE + " = ?", new String[] { scope },
 				null, null, null);
 		
 		Map<String, Request> waits = new HashMap<String, Request>(cursor.getCount(), 1);
@@ -202,7 +191,7 @@ class Database extends SQLiteOpenHelper {
 	 */
 	List<Request> popMissingTags(String scope) {
 		Cursor cursor = db.query(RETRY, new String[] { INSTRUCTION, URI, INPUT, MISSING_TAGS },
-				"? = ?", new String[] { SCOPE, scope },
+				SCOPE + " = ?", new String[] { scope },
 				null, null, null);
 		
 		StringMap tags = new CollectionStringMap(getData(scope));
@@ -261,7 +250,7 @@ class Database extends SQLiteOpenHelper {
 	 */
 	Map<String, Map<String, String>> getChildren(String source) {
 		Cursor cursor = db.query(RELATIONSHIPS, new String[] { SCOPE, NAME, VALUE }, 
-				"? = ?", new String[] { SOURCE, source }, 
+				SOURCE + " = ?", new String[] { source }, 
 				null, null, null);
 		
 		Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
@@ -291,7 +280,7 @@ class Database extends SQLiteOpenHelper {
 	 */
 	String getSource(String scope) {
 		Cursor cursor = db.query(RELATIONSHIPS, new String[] { SOURCE },
-				"? = ?", new String[] { SCOPE, scope },
+				SCOPE + " = ?", new String[] { scope },
 				null, null, null);
 		
 		return cursor.moveToFirst() ? cursor.getString(0) : null;
@@ -312,7 +301,7 @@ class Database extends SQLiteOpenHelper {
 	Cookies getCookiesInScope(String scope) {
 		HashtableCookies cookies = new HashtableCookies();
 		Cursor cursor = db.query(COOKIES, new String[] { HOST, COOKIE },
-				"? = ?", new String[] { SCOPE, scope },
+				SCOPE + " = ?", new String[] { scope },
 				null, null, null);
 		
 		while(cursor.moveToNext()) {
@@ -326,8 +315,9 @@ class Database extends SQLiteOpenHelper {
 		Map<String, String> data = new HashMap<String, String>();
 
 		Cursor cursor = db.query(
-				DATA, new String[] { NAME, VALUE }, "? = ?",
-				new String[] { SCOPE, scope }, null, null, null);
+				DATA, new String[] { NAME, VALUE },
+				SCOPE + " = ?", new String[] { scope },
+				null, null, null);
 
 		while(cursor.moveToNext()) {
 			data.put(cursor.getString(0), cursor.getString(1));

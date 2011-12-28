@@ -5,6 +5,7 @@
 package com.accursedware.bartleby;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,12 +54,15 @@ public class BartlebyRequester implements Loggable {
 	public void request(String id, String instruction, String uri, String input, boolean force) {
 		StringMap tags = new CollectionStringMap(db.getData(id));
 		Cookies cookies = db.getCookies(id);
-		RunnableRequest req = new RunnableRequest(this, scraper, 
-				new Request(id, instruction, uri, input, tags, cookies, force));
-		if(force) {
-			loadSvc.submit(req); // save laggy loads for this thread.
+		request(new Request(id, instruction, uri, input, tags, cookies, force));
+	}
+	
+	public void request(Request request) {
+		RunnableRequest rRequest = new RunnableRequest(this, scraper, request);
+		if(request.force) {
+			loadSvc.submit(rRequest); // save laggy loads for this thread.
 		} else {
-			findSvc.submit(req);
+			findSvc.submit(rRequest);
 		}
 	}
 	
@@ -97,7 +101,13 @@ public class BartlebyRequester implements Loggable {
 			for(String child : children) {
 				request(id, child, uri, value, false);
 			}
-		}		
+		}
+		
+		// retry stuck instructions that may now be un-stuck.
+		List<Request> retry = db.popMissingTags(request.id);
+		for(Request retryRequest : retry) {
+			request(retryRequest.id, retryRequest.instruction, retryRequest.uri, retryRequest.input, false);
+		}
 	}
 	
 	private void handleWaitResponse(Request request, String description) {
