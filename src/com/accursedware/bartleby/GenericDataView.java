@@ -6,11 +6,9 @@ package com.accursedware.bartleby;
 
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
 
 /**
  * @author talos
@@ -25,15 +23,16 @@ class GenericDataView implements DatabaseListener {
 	private final TextView title;
 	private final ListView data;
 	private final BartlebyRequester requester;
-	//private final ScrollView view;
-	private final LinearLayout view;
+	private final ScrollView view;
+	//private final LinearLayout view;
 	
 	GenericDataView(Database db, BartlebyRequester requester, ViewGroup parent) {
 		this.db = db;
 		this.db.addListener(this);
 		
-		//view = (ScrollView) View.inflate(parent.getContext(), R.layout.generic_data_view, parent);
-		view = (LinearLayout) View.inflate(parent.getContext(), R.layout.generic_data_view, parent);
+		View.inflate(parent.getContext(), R.layout.generic_data_view, parent);
+		view = (ScrollView) parent.findViewById(R.id.generic_data_view);
+		//view = (LinearLayout) View.inflate(parent.getContext(), R.layout.generic_data_view, parent);
 		
 		this.title = (TextView) view.findViewById(R.id.title);
 		this.data = (ListView) view.findViewById(R.id.data);
@@ -49,8 +48,7 @@ class GenericDataView implements DatabaseListener {
 		}
 	}
 	
-//	ScrollView getUnderlyingView() {
-	LinearLayout getUnderlyingView() {
+	ScrollView getUnderlyingView() {
 		return view;
 	}
 	

@@ -29,25 +29,26 @@ public final class R {
         public static final int red_marker=0x7f020009;
     }
     public static final class id {
-        public static final int about=0x7f0a0013;
+        public static final int about=0x7f0a0014;
         public static final int about_text=0x7f0a0000;
-        public static final int autocomplete_address=0x7f0a000f;
-        public static final int autocomplete_holder=0x7f0a000e;
-        public static final int autocomplete_progress=0x7f0a0010;
+        public static final int autocomplete_address=0x7f0a0010;
+        public static final int autocomplete_holder=0x7f0a000f;
+        public static final int autocomplete_progress=0x7f0a0011;
         public static final int balloon_inner_layout=0x7f0a0003;
         public static final int balloon_item_snippet=0x7f0a0005;
         public static final int balloon_item_title=0x7f0a0004;
         public static final int balloon_main_layout=0x7f0a0002;
         public static final int children=0x7f0a0007;
-        public static final int data=0x7f0a000b;
+        public static final int data=0x7f0a000c;
+        public static final int generic_data_view=0x7f0a000a;
         public static final int go_to_child_button=0x7f0a0009;
-        public static final int load_button=0x7f0a0012;
-        public static final int loading=0x7f0a000c;
-        public static final int mapview=0x7f0a0011;
-        public static final int master=0x7f0a000d;
+        public static final int load_button=0x7f0a0013;
+        public static final int loading=0x7f0a000d;
+        public static final int mapview=0x7f0a0012;
+        public static final int master=0x7f0a000e;
         public static final int name=0x7f0a0006;
-        public static final int options=0x7f0a0014;
-        public static final int title=0x7f0a000a;
+        public static final int options=0x7f0a0015;
+        public static final int title=0x7f0a000b;
         public static final int value=0x7f0a0008;
         public static final int version_text=0x7f0a0001;
     }

@@ -6,6 +6,8 @@ package com.accursedware.bartleby;
 
 import java.util.List;
 
+import net.caustic.log.AndroidLogger;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -49,6 +51,7 @@ public class BartlebyActivity extends MapActivity {
 		
 		Database db = new Database(this);
 		BartlebyRequester requester = new BartlebyRequester(getString(R.string.root_url), db);
+		requester.register(new AndroidLogger(this));
 		
 		// Set up the mapView.
 		MapView mapView = (MapView) findViewById(R.id.mapview);

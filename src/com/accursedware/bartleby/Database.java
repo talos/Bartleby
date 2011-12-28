@@ -31,7 +31,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 class Database extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "bartleby";
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 2;
 	
 	private static final String DATA = "data";
 	private static final String RELATIONSHIPS = "relationships";
@@ -59,33 +59,55 @@ class Database extends SQLiteOpenHelper {
 		this.db = getWritableDatabase();
 	}
 	
-	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		// relationship table
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + RELATIONSHIPS +
-				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " + SOURCE + " VARCHAR, " + SCOPE + " VARCHAR, " + NAME + " VARCHAR, " + VALUE + " VARCHAR)");
+				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+				SOURCE + " VARCHAR, " +
+				SCOPE  + " VARCHAR, " +
+				NAME   + " VARCHAR, " +
+				VALUE  + " VARCHAR)");
 		
 		// data table
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + DATA +
-				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " + SCOPE + " VARCHAR, " + NAME + " VARCHAR, " + VALUE + " VARCHAR)");
+				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+				SCOPE + " VARCHAR, " +
+				NAME  + " VARCHAR, " +
+				VALUE + " VARCHAR)");
 		
 		// wait table
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + WAIT +
-				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " + SCOPE + " VARCHAR, " + INSTRUCTION + " VARCHAR, " + URI + " VARCHAR)");
+				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+				SCOPE       + " VARCHAR, " +
+				INSTRUCTION + " VARCHAR, " +
+				URI         + " VARCHAR)");
 
 		// retry table
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + RETRY +
-				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " + SCOPE + " VARCHAR, " + INSTRUCTION + " VARCHAR, " + URI + " VARCHAR, " + MISSING_TAGS + "VARCHAR)");
+				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+				SCOPE        + " VARCHAR, " +
+				INSTRUCTION  + " VARCHAR, " +
+				URI          + " VARCHAR, " +
+				MISSING_TAGS + " VARCHAR)");
 
 		// cookies (browser state) table
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + COOKIES +
-				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " + SCOPE + " VARCHAR, " + HOST + " VARCHAR, " + COOKIE + "VARCHAR)");
+				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+				SCOPE  + " VARCHAR, " +
+				HOST   + " VARCHAR, " +
+				COOKIE + " VARCHAR)");
 	}
 	
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		android.util.Log.i(DATABASE_NAME, "unhandled upgrade");
+		android.util.Log.i(DATABASE_NAME, "upgrading, this throws away old db");
+		db.execSQL("DROP TABLE IF EXISTS " + RELATIONSHIPS);
+		db.execSQL("DROP TABLE IF EXISTS " + DATA);
+		db.execSQL("DROP TABLE IF EXISTS " + WAIT);
+		db.execSQL("DROP TABLE IF EXISTS " + RETRY);
+		db.execSQL("DROP TABLE IF EXISTS " + COOKIES);
+		onCreate(db); // re-create db
 	}
 	
 	void addListener(DatabaseListener listener) {

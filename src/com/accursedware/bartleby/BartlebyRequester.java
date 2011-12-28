@@ -48,7 +48,8 @@ public class BartlebyRequester implements Loggable {
 	
 	public void request(BartlebyAddress address) {
 		String id = address.getID().toString();
-		request(id, rootURL.resolve(address.getPath()).toString(), "", null, true); // immediately force load on these.
+		request(id, StringUtils.quote(rootURL.resolve(address.getPath()).toString()),
+				"", null, true); // immediately force load on these.
 	}
 
 	public void request(String id, String instruction, String uri, String input, boolean force) {
@@ -60,20 +61,25 @@ public class BartlebyRequester implements Loggable {
 	public void request(Request request) {
 		RunnableRequest rRequest = new RunnableRequest(this, scraper, request);
 		if(request.force) {
+			log.i(StringUtils.quote(request.toString()) + " requested on loadSvc.");
 			loadSvc.submit(rRequest); // save laggy loads for this thread.
 		} else {
+			log.i(StringUtils.quote(request.toString()) + " requested on findSvc.");
 			findSvc.submit(rRequest);
 		}
 	}
 	
 	public void finished(Request request, Response response) {		
+		log.i(StringUtils.quote(request.toString()) + " is finished: " + StringUtils.quote(response.serialize()));
 		if(response.values != null) {
 			handleFindResponse(request, response.name, response.values, response.uri, response.children);
 		} else if(response.wait){
 			handleWaitResponse(request, response.description);
 		} else if(response.content != null || response.cookies != null) {
 			handleLoadResponse(request, response.content, response.cookies, response.uri, response.children);
-		} else if(response.missingTags != null) {
+		}else if(response.children != null) {
+			handleReferenceResponse(request, response.uri, response.children);
+		}  else if(response.missingTags != null) {
 			handleMissingTags(request, response.missingTags);
 		} else if(response.failedBecause != null) {
 			handleFailure(request, response.failedBecause);
@@ -83,6 +89,7 @@ public class BartlebyRequester implements Loggable {
 	}
 	
 	private void handleFindResponse(Request request, String name, String[] values, String uri, String[] children) {
+		log.i(StringUtils.quote(request.toString()) + " responded with find: " + StringUtils.quote(values));
 		final boolean isBranch = values.length > 1;
 
 		for(String value : values) {
@@ -111,22 +118,33 @@ public class BartlebyRequester implements Loggable {
 	}
 	
 	private void handleWaitResponse(Request request, String description) {
+		log.i(StringUtils.quote(request.toString()) + " responded with wait: " + StringUtils.quote(description));
 		db.saveWait(request.id, request.instruction, request.uri, description);
 	}
 	
 	private void handleLoadResponse(Request request, String content, Cookies cookies, String uri, String[] children) {
+		log.i(StringUtils.quote(request.toString()) + " responded with load, adding cookies: " + cookies.toString());
 		db.saveCookies(request.id, cookies);
 		for(String child : children) {
 			request(request.id, child, uri, content, false);
 		}		
 	}
 	
+	private void handleReferenceResponse(Request request, String uri, String[] children) {
+		log.i(StringUtils.quote(request.toString()) + " responded with reference uri: " + StringUtils.quote(uri));
+		for(String child : children) {
+			// follow the response's uri, but keep everything else the same as request.
+			request(request.id, child, uri, request.input, request.force);
+		}
+	}
+	
 	private void handleMissingTags(Request request, String[] missingTags) {
+		log.i(StringUtils.quote(request.toString()) + " missing tags: " + StringUtils.quoteJoin(missingTags, ","));
 		db.saveMissingTags(request.id, request.instruction, request.uri, request.input, missingTags);
 	}
 	
 	private void handleFailure(Request request, String failedBecause) {
-		log.i("Error with " + StringUtils.quote(request.toString()) + ": " + StringUtils.quote(failedBecause));
+		log.i(StringUtils.quote(request.toString()) + " failed: " + StringUtils.quote(failedBecause));
 	}
 
 	public void interrupt(Throwable why) {
