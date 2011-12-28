@@ -15,7 +15,7 @@ import com.google.android.maps.GeoPoint;
 	* an exception occurs while looking up a location.
 	* @author talos
 	**/
-public interface AsyncReverseGeocoderListener {
+public interface AsyncReverseGeocoderListener extends BaseAsyncGeocoderListener {
 
 	/**
 	 * This is called when a single address has been found looking for a point.
@@ -32,9 +32,4 @@ public interface AsyncReverseGeocoderListener {
 	 */
 	public abstract void onNoAddressesFound(GeoPoint point);
 
-	/**
-	 * This is called when an {@link IOException} has occurred.
-	 * @param e
-	 */
-	public abstract void onError(IOException e);
 }

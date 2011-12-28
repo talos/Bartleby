@@ -5,14 +5,18 @@
 package com.accursedware.bartleby;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import net.caustic.util.CollectionStringMap;
+import net.caustic.util.StringMap;
 
 import com.google.android.maps.GeoPoint;
 
 import android.location.Address;
-import android.util.Log;
 
 /**
  * An address with a street number,
@@ -23,9 +27,12 @@ import android.util.Log;
  */
 
 public final class BartlebyAddress {
-	public final String number;
-	public final String street;
-	public final String zip;
+	private static final String NUMBER = "Number";
+	private static final String STREET = "Street";
+	
+	private final String number;
+	private final String street;
+	private final String zip;
 	
 	private final GeoPoint geoPoint;
 	private final String asString;
@@ -121,6 +128,29 @@ public final class BartlebyAddress {
 	
 	/**
 	 * 
+	 * @return A {@link Map} version of this {@link BartlebyAddress}.
+	 */
+	public final Map<String, String> getMap() {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put(NUMBER, number);
+		map.put(STREET, street);
+		return map;
+	}
+	
+	/**
+	 * 
+	 * @return A {@link String} path to scrapers for this address.
+	 */
+	public final String getPath() {
+		return zip + '/';
+	}
+	
+	public final UUID getID() {
+		return UUID.nameUUIDFromBytes(asString.getBytes());
+	}
+	
+	/**
+	 * 
 	 * @param addresses A {@link List} of {@link Address}es.  Can be <code>null</code>,
 	 * in which case an empty list is returned.
 	 * @return A {@link List} of {@link BartlebyAddress} from the supplied <code>addresses</code>.
@@ -142,5 +172,12 @@ public final class BartlebyAddress {
 			}
 			return bAddresses;
 		}
+	}
+
+	/**
+	 * @return
+	 */
+	public CharSequence getLocalString() {
+		return this.number + ' ' + this.street;
 	}
 }

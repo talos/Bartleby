@@ -16,7 +16,7 @@ import com.accursedware.bartleby.BartlebyAddress;
  * @author talos
  *
  */
-public interface AsyncGeocoderListener {
+public interface AsyncGeocoderListener extends BaseAsyncGeocoderListener {
 
 	/**
 	 * This is called when a series of addresses have been found.
@@ -33,9 +33,4 @@ public interface AsyncGeocoderListener {
 	 */
 	public abstract void onNoAddressesFound(String locationName);
 
-	/**
-	 * This is called when an {@link IOException} has occurred.
-	 * @param e
-	 */
-	public abstract void onError(IOException e);
 }

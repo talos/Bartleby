@@ -1,0 +1,344 @@
+/**
+ * Bartleby Android
+ * A project to enable public access to public building information.
+ */
+package com.accursedware.bartleby;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import net.caustic.Request;
+import net.caustic.http.Cookies;
+import net.caustic.http.HashtableCookies;
+import net.caustic.util.CollectionStringMap;
+import net.caustic.util.StringMap;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+/**
+ * @author talos
+ *
+ */
+class Database extends SQLiteOpenHelper {
+	private static final String DATABASE_NAME = "bartleby";
+	private static final int DATABASE_VERSION = 3;
+	
+	private static final String DATA = "data";
+	private static final String RELATIONSHIPS = "relationships";
+	private static final String COOKIES = "cookies";
+	private static final String WAIT = "wait";
+	private static final String RETRY = "retry";
+	
+	private static final String SOURCE = "source";
+	private static final String SCOPE = "scope";
+	private static final String NAME = "name";
+	private static final String VALUE = "value";
+	private static final String INPUT = "input";
+	private static final String MISSING_TAGS = "missing_tags";
+	private static final String URI = "uri";
+	private static final String INSTRUCTION = "instruction";
+	private static final String COOKIE = "cookie";
+	private static final String HOST = "host";
+	private static final String DESCRIPTION = "description";
+	
+	private SQLiteDatabase db;
+	private final List<DatabaseListener> listeners = new ArrayList<DatabaseListener>();
+	
+	Database(Context context) {
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		this.db = getWritableDatabase();
+	}
+	
+	
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		// relationship table
+		db.execSQL("CREATE TABLE ? IF NOT EXISTS (? VARCHAR, ? VARCHAR)",
+				new String[] { RELATIONSHIPS, SOURCE, SCOPE, NAME } );
+		
+		// data table
+		db.execSQL("CREATE TABLE ? IF NOT EXISTS (? VARCHAR, ? VARCHAR, ? VARCHAR)",
+				new String[] { DATA, SCOPE, NAME, VALUE } );
+		
+		// wait table
+		db.execSQL("CREATE TABLE ? IF NOT EXISTS (? VARCHAR, ? VARCHAR, ? VARCHAR)",
+				new String[] { WAIT, SCOPE, INSTRUCTION, URI } );
+
+		// retry table
+		db.execSQL("CREATE TABLE ? IF NOT EXISTS (? VARCHAR, ? VARCHAR, ? VARCHAR, ? VARCHAR)",
+				new String[] { RETRY, SCOPE, INSTRUCTION, URI, MISSING_TAGS } );
+		
+		// cookies (browser state) table
+		db.execSQL("CREATE TABLE ? IF NOT EXISTS (? VARCHAR, ? VARCHAR, ? VARCHAR)",
+				new String[] { COOKIES, SCOPE, HOST, COOKIE } );
+		
+		// addresses table
+		/*db.execSQL("CREATE TABLE ? IF NOT EXISTS (? VARCHAR, ? VARCHAR)",
+				new String[] { ADDRESSES, SCOPE, ADDRESS } );*/
+	}
+	
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		android.util.Log.i(DATABASE_NAME, "unhandled upgrade");
+	}
+	
+	void addListener(DatabaseListener listener) {
+		listeners.add(listener);
+	}
+	/*
+	void saveAddress(String scope, String address) {
+		ContentValues cv = new ContentValues(2);
+		cv.put(SCOPE, scope);
+		cv.put(ADDRESS, address);
+		db.insert(ADDRESSES, null, cv);
+	}*/
+	
+	void saveData(String scope, String name, String value) {
+		ContentValues cv = new ContentValues(3);
+		cv.put(SCOPE, scope);
+		cv.put(NAME, name);
+		cv.put(VALUE, value);
+		db.insert(DATA, null, cv);
+		
+		notifyListeners(scope);
+	}
+	
+	void saveRelationship(String scope, String source, String name, String value) {
+		ContentValues cv = new ContentValues(2);
+		cv.put(SOURCE, source);
+		cv.put(SCOPE, scope);
+		cv.put(NAME, name);
+		cv.put(VALUE, value);
+		db.insert(RELATIONSHIPS, null, cv);
+	}
+	
+	void saveCookies(String scope, Cookies cookies) {
+		ContentValues cv = new ContentValues(3);
+		cv.put(SCOPE, scope);
+		String[] hosts = cookies.getHosts();
+		for(String host : hosts) {
+			cv.put(HOST, host);
+			String[] cookiesForHost = cookies.get(host);
+			for(String cookie : cookiesForHost) {
+				cv.put(COOKIE, cookie);
+				db.insert(COOKIES, null, cv);
+			}
+		}
+	}
+	
+	void saveWait(String scope, String instruction, String uri, String description) {
+		ContentValues cv = new ContentValues(3);
+		cv.put(SCOPE, scope);
+		cv.put(INSTRUCTION, instruction);
+		cv.put(URI, uri);
+		cv.put(DESCRIPTION, description);
+		db.insert(WAIT, null, cv);
+		
+		notifyListeners(scope);
+	}
+	
+	void saveMissingTags(String scope, String instruction, String uri, String input, String[] missingTags) {
+
+		ContentValues cv = new ContentValues(4);
+		cv.put(SCOPE, scope);
+		cv.put(INSTRUCTION, instruction);
+		cv.put(URI, uri);
+		cv.put(INPUT, input);
+		cv.put(MISSING_TAGS, new JSONArray(Arrays.asList(missingTags)).toString()); // serialize missing tags via JSON
+		db.insert(RETRY, null, cv);
+	}
+	
+	/**
+	 * The returned Wait request will have force enabled.
+	 * @param scope
+	 * @return A map of {@link Request}s keyed by name.
+	 */
+	Map<String, Request> getWait(String scope) {
+		Cursor cursor = db.query(WAIT, new String[] { INSTRUCTION, URI, DESCRIPTION }, 
+				"? = ?", new String[] { SCOPE, scope },
+				null, null, null);
+		
+		Map<String, Request> waits = new HashMap<String, Request>(cursor.getCount(), 1);
+		while(cursor.moveToNext()) {
+			String instruction = cursor.getString(0);
+			String uri = cursor.getString(1);
+			String description = cursor.getString(2);
+			
+			String name;
+			// try to pull a name out of description.
+			if(description != null) {
+				try {
+					JSONObject obj = new JSONObject(description);
+					name = obj.getString("name");
+				} catch(JSONException e) {
+					name = description;
+				}
+			} else {
+				name = instruction;
+			}
+				
+			// input is null
+			waits.put(name, new Request(scope, instruction, uri, null,
+					new CollectionStringMap(getData(scope)), getCookies(scope), true));
+		}
+		return waits;
+	}
+	
+	/**
+	 * This will only return Requests that were missing tags that can now be executed.
+	 * They will be removed from the database.  They will not be forced.
+	 * @param scope
+	 * @return
+	 */
+	List<Request> popMissingTags(String scope) {
+		Cursor cursor = db.query(RETRY, new String[] { INSTRUCTION, URI, INPUT, MISSING_TAGS },
+				"? = ?", new String[] { SCOPE, scope },
+				null, null, null);
+		
+		StringMap tags = new CollectionStringMap(getData(scope));
+		Cookies cookies = null; // these are lazily loaded in the event that there actually are requests
+		List<Request> result = new ArrayList<Request>(cursor.getCount());
+		while(cursor.moveToNext()) {
+			String instruction = cursor.getString(0);
+			String uri = cursor.getString(1);
+			String input = cursor.getString(2);
+			
+			// only return requests that are no longer missing tags.
+			boolean isReady = true;
+			try {
+				JSONArray missingTagsJSON = new JSONArray(cursor.getString(3));
+				for(int i = 0 ; i < missingTagsJSON.length() ; i ++) {
+					if(tags.get(missingTagsJSON.getString(i)) == null) {
+						isReady = false;
+						break;
+					}
+				}
+			} catch(JSONException e) { // this shouldn't happen!!
+				throw new RuntimeException("Invalid JSON in database", e);
+			}
+			
+			if(isReady) {
+				if(cookies == null) {
+					cookies = getCookies(scope);
+				}
+				result.add(new Request(scope, instruction, uri, input, tags, cookies, false));
+			}
+		}
+		
+		return result;
+	}
+	
+	Map<String, String> getData(String scope) {
+		Map<String, String> parentData = new HashMap<String, String>();
+		Map<String, String> thisData = getDataInScope(scope);
+		
+		// loop through source scopes.
+		while((scope = getSource(scope)) != null) {
+			// This ensures that child keys overwrite parent keys.
+			Map<String, String> interData = getDataInScope(scope);
+			interData.putAll(parentData);
+			parentData = interData;
+		}
+		
+		parentData.putAll(thisData);
+		return parentData;
+	}
+	
+	/**
+	 * 
+	 * @param source
+	 * @return A map of children ID : branch value maps, keyed by name.
+	 */
+	Map<String, Map<String, String>> getChildren(String source) {
+		Cursor cursor = db.query(RELATIONSHIPS, new String[] { SCOPE, NAME, VALUE }, 
+				"? = ?", new String[] { SOURCE, source }, 
+				null, null, null);
+		
+		Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
+		while(cursor.moveToNext()) {
+			String scope = cursor.getString(0);
+			String name = cursor.getString(1);
+			String value = cursor.getString(2);
+			final Map<String, String> child;
+			
+			// create list if it doesn't already exist in result
+			if(!result.containsKey(name)) {
+				child = new HashMap<String, String>();
+				result.put(name, child);
+			} else {
+				child = result.get(name);
+			}
+			child.put(scope, value);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @param scope The {@link String} scope whose source should be found.
+	 * @return A {@link String} source scope, if one exists; <code>null</code> otherwise.
+	 */
+	String getSource(String scope) {
+		Cursor cursor = db.query(RELATIONSHIPS, new String[] { SOURCE },
+				"? = ?", new String[] { SCOPE, scope },
+				null, null, null);
+		
+		return cursor.moveToFirst() ? cursor.getString(0) : null;
+	}
+	
+	Cookies getCookies(String scope) {
+		Cookies thisCookies = getCookiesInScope(scope);
+		HashtableCookies parentCookies = new HashtableCookies();
+		
+		while((scope = getSource(scope)) != null) {
+			parentCookies.extend(getCookiesInScope(scope));
+		}
+		
+		parentCookies.extend(thisCookies);
+		return parentCookies;
+	}
+	
+	Cookies getCookiesInScope(String scope) {
+		HashtableCookies cookies = new HashtableCookies();
+		Cursor cursor = db.query(COOKIES, new String[] { HOST, COOKIE },
+				"? = ?", new String[] { SCOPE, scope },
+				null, null, null);
+		
+		while(cursor.moveToNext()) {
+			String host = cursor.getString(0);
+			cookies.add(host, cursor.getString(1));
+		}
+		return cookies;
+	}
+	
+	Map<String, String> getDataInScope(String scope) {
+		Map<String, String> data = new HashMap<String, String>();
+
+		Cursor cursor = db.query(
+				DATA, new String[] { NAME, VALUE }, "? = ?",
+				new String[] { SCOPE, scope }, null, null, null);
+
+		while(cursor.moveToNext()) {
+			data.put(cursor.getString(0), cursor.getString(1));
+		}
+		
+		return data;
+	}
+	
+	private void notifyListeners(String scope) {
+		for(DatabaseListener listener : listeners) {
+			listener.updated(scope);
+		}
+	}
+}

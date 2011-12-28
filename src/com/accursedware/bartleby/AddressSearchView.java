@@ -27,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 /**
@@ -38,7 +39,15 @@ import android.widget.Toast;
 final class AddressSearchView {
 	private final AutoCompleteTextView tv;
 	
-	private boolean hasFocus = false;
+	/**
+	 * This is set to <code>true</code> when something other than the user
+	 * changes the text.
+	 */
+	private boolean forcedTextChange = false;
+	
+	//private final ProgressBar progress;
+	
+	//private boolean hasFocus = false;
 	
 	/**
 	 * The last real {@link BartlebyAddress} picked from the adapter.
@@ -48,9 +57,12 @@ final class AddressSearchView {
 	public AddressSearchView(final Activity activity,
 			final AsyncGeocoder geocoder,
 			final AutoCompleteTextView tv,
+			final ProgressBar progress,
 			final MapView map,
 			final PropertyOverlay overlay) {
 		this.tv = tv;
+		//progress.setVisibility(View.VISIBLE);
+		//this.progress = progress;
 		
 		//tv.setSelectAllOnFocus(true); // this should be set through the XML, too
 		/*
@@ -65,15 +77,17 @@ final class AddressSearchView {
 			@Override
 			public void onFound(String locationName, final List<BartlebyAddress> addresses) {
 				// gotta use the UI thread.
-				activity.runOnUiThread(new Runnable() {
+				tv.post(new Runnable() {
 					public void run() {
+						progress.setVisibility(View.INVISIBLE);
 						ArrayAdapter<BartlebyAddress> adapter =
-								new ArrayAdapter<BartlebyAddress>(activity, R.layout.autocomplete, addresses);
+								new ArrayAdapter<BartlebyAddress>(tv.getContext(), R.layout.autocomplete, addresses);
 						
 						tv.setAdapter(adapter);
 						tv.showDropDown();
 					}
 				});
+				//activity.runOnUiThread();
 			}
 
 			/**
@@ -82,19 +96,35 @@ final class AddressSearchView {
 			 */
 			@Override
 			public void onNoAddressesFound(final String locationName) {
-				activity.runOnUiThread(new Runnable() {
+				tv.post(new Runnable() {
 					public void run() {
-						Toasts.showNoAddressesFound(activity, locationName);
+						progress.setVisibility(View.INVISIBLE);
 						
 						//ArrayAdapter<BartlebyAddress> empty = new ArrayAdapter<BartlebyAddress>();
 					}
 				});
+				Toasts.showNoAddressesFound(activity, locationName);
 			}
 			
 			@Override
 			public void onError(IOException e) {
+				tv.post(new Runnable() {
+					public void run() {
+						progress.setVisibility(View.INVISIBLE);
+					}
+				});
+				
 				Toasts.showGeocoderError(activity);
 				e.printStackTrace();
+			}
+
+			@Override
+			public void onCancel() {
+				tv.post(new Runnable() {
+					public void run() {
+						progress.setVisibility(View.INVISIBLE);
+					}
+				});
 			}
 		};
 		
@@ -108,45 +138,23 @@ final class AddressSearchView {
 		tv.addTextChangedListener(new TextWatcher() {
 			
 			private final int threshold = activity.getResources().getInteger(R.integer.completion_threshold);
-			private final int delay = activity.getResources().getInteger(R.integer.autocomplete_delay);
-			
-			private final Timer timer = new Timer();
-			
-			private TimerTask lastTimer;
 			
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {}
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
 			
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 			
 			@Override
 			public void afterTextChanged(Editable s) {
-				// cancel the last timer no matter what if text changed.
-				if(lastTimer != null) {
-					lastTimer.cancel();
+				if(forcedTextChange) {
+					forcedTextChange = false;
+				} else if(s.length() > threshold) {
+					geocoder.cancelLastSearch();
+					progress.setVisibility(View.VISIBLE);
+					geocoder.lookup(tv.getText().toString(), listener, map);
 				}
-				
-				// we check against threshold twice -- first to schedule the task.
-				if(s.length() > threshold) {
-					lastTimer = new TimerTask() {
-						
-						@Override
-						public void run() {
-							String locationName = tv.getText().toString();
-							
-							// we check against threshold twice -- second to see if we
-							// should still bother calling the geocoder after the timeout
-							if(locationName.length() >= threshold) {
-								// use the text as it exists when this is called, instead
-								// of the {@link Editable} <code>s</code>
-								geocoder.lookup(tv.getText().toString(), listener, map);
-							}
-						}
-					};
-					// only call the geocoder if a certain amount of time has elapsed.
-					timer.schedule(lastTimer, delay);
-				}				
 			}
 		});
 		
@@ -207,9 +215,11 @@ final class AddressSearchView {
 	
 	/**
 	 * Set the content of the the search view to a {@link BartlebyAddress}.
+	 * Does not call the text change handler.
 	 * @param address
 	 */
-	public void setText(BartlebyAddress address) {
+	void setText(BartlebyAddress address) {
+		forcedTextChange = true;
 		tv.setText(address.toString());
 	}
 	
@@ -217,8 +227,14 @@ final class AddressSearchView {
 	 * 
 	 * @return The currently entered text.
 	 */
-	public String getText() {
+	String getText() {
 		return tv.getText().toString();
 	}
 	
+	/**
+	 * Give focus to this element.
+	 */
+	void focus() {
+		tv.selectAll();
+	}
 }

@@ -6,6 +6,7 @@ package com.accursedware.bartleby.geocoding;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -13,19 +14,21 @@ import java.util.concurrent.Future;
 import com.accursedware.bartleby.BartlebyAddress;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
+import com.accursedware.bartleby.R;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.location.Address;
 import android.location.Geocoder;
-import android.os.Looper;
-import android.test.IsolatedContext;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Nonblocking {@link Geocoder} using {@link AsyncGeocoderListener}.
  * Uses a single worker thread, which is terminated if any additional
- * lookups are done before it finishes.
+ * lookups are done before it finishes.  Displays a progress dialog
+ * while searching.
  * @author talos
  *
  */
@@ -44,12 +47,15 @@ public final class AsyncGeocoder {
 	 * Max number of address results to retrieve.
 	 */
 	private static final int MAX_RESULTS = 4;
-	//private final Context context;
+	
 	private Geocoder geocoder;
 	private boolean paused = false;
 	
-	private final ExecutorService worker = Executors.newSingleThreadExecutor();
 	private Future<?> lastSearch;
+	private BaseAsyncGeocoderListener lastListener;
+
+	
+	private final ExecutorService worker = Executors.newSingleThreadExecutor();
 	
 	public AsyncGeocoder(Context context) {
 		resume(context);
@@ -70,6 +76,8 @@ public final class AsyncGeocoder {
 			return;
 		}
 		cancelLastSearch();
+		//showDialog(activity, activity.getString(R.string.geocoding, locationName));
+		lastListener = listener;
 		lastSearch = worker.submit(new Runnable() {
 			public void run() {
 				try {
@@ -103,7 +111,7 @@ public final class AsyncGeocoder {
 						addresses = geocoder.getFromLocationName(
 								locationName, MAX_RESULTS);
 					}
-					
+
 					List<BartlebyAddress> bAddresses = BartlebyAddress.fromAddressArray(addresses);
 					
 					if(bAddresses.size() > 0) {
@@ -113,7 +121,10 @@ public final class AsyncGeocoder {
 					}
 				} catch(IOException e) {
 					listener.onError(e);
-				}
+				}/* finally {
+					dialog.dismiss();
+					dialog = null;
+				}*/
 			}
 		});
 	}
@@ -130,8 +141,12 @@ public final class AsyncGeocoder {
 			return;
 		}
 		cancelLastSearch();
+		//showDialog(activity, activity.getString(R.string.reverse_geocoding));
+		lastListener = listener;
 		lastSearch = worker.submit(new Runnable() {
 			public void run() {
+				//dialog.dismiss();
+				//dialog = null;
 				try {
 					List<BartlebyAddress> addresses =
 							BartlebyAddress.fromAddressArray(geocoder.getFromLocation(latitude, longitude, 1));
@@ -143,7 +158,10 @@ public final class AsyncGeocoder {
 					}
 				} catch(IOException e) {
 					listener.onError(e);
-				}
+				}/* finally {
+					dialog.dismiss();
+					dialog = null;
+				}*/
 			}
 		});
 	}
@@ -167,6 +185,11 @@ public final class AsyncGeocoder {
 	 */
 	public void pause() {
 		cancelLastSearch();
+		/*if(dialog != null) {
+			if(dialog.isShowing()) {
+				dialog.cancel(); // cancels the last search
+			}
+		}*/
 		geocoder = null;
 		paused = true;
 	}
@@ -174,13 +197,16 @@ public final class AsyncGeocoder {
 	/**
 	 * Attempt to cancel the last search.
 	 */
-	private void cancelLastSearch() {
+	public void cancelLastSearch() {
 		// should this be threaded? could lock up UI.
 		if(lastSearch != null) {
 			if(!lastSearch.isDone()) {
 				//Log.i(context.getString(R.string.app_name), "Cancelling last address search");
+				lastSearch.cancel(true);
+				lastListener.onCancel();
 			}
-			lastSearch.cancel(true);
 		}
 	}
+	
+	
 }

@@ -5,6 +5,7 @@
     <string name="address_hint">Look Up Address</string>
 	    
     <string name="root_url">http://www.accursedware.com:6767/</string>
+    <string name="path_to_db"></string>
     <string name="loading">Loading data...</string>
     
     <string name="failed">Could not get data for address.</string>
@@ -18,6 +19,9 @@
     <string name="no_address_for_point">Can\'t find address.</string>
     <string name="no_geocoder">No geocoder available.</string>
     <string name="no_server">No Caustic template server available.</string>
+    
+    <string name="geocoding">Searching for "<i>%s</i>"...</string>
+    <string name="reverse_geocoding">Locating...</string>
     
 	<string name="about_title">About Bartleby</string>
     <string-array name="about_paragraphs">

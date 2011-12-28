@@ -16,6 +16,7 @@
 package com.readystatesoftware.mapviewballoons;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,19 +71,11 @@ public class BalloonOverlayView<Item extends OverlayItem> extends FrameLayout {
 		title = (TextView) v.findViewById(R.id.balloon_item_title);
 		snippet = (TextView) v.findViewById(R.id.balloon_item_snippet);
 		
-		ImageView close = (ImageView) v.findViewById(R.id.close_img_button);
-		close.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				layout.setVisibility(GONE);
-			}
-		});
-
 		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		params.gravity = Gravity.NO_GRAVITY;
 
 		addView(layout, params);
-
 	}
 	
 	/**

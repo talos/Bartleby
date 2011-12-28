@@ -8,19 +8,13 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.pm.PackageInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.Toast;
+import android.widget.ProgressBar;
 
 import com.accursedware.bartleby.geocoding.AsyncGeocoder;
 import com.accursedware.bartleby.util.NetworkUtils;
@@ -41,6 +35,7 @@ public class BartlebyActivity extends MapActivity {
 	private AsyncGeocoder geocoder;
 	private ServerPinger pinger;
 	private Locator locator;
+	private AddressSearchView search;
 	
 	/**
 	 * Set up app basics, inflate views etc.
@@ -48,11 +43,12 @@ public class BartlebyActivity extends MapActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		// Inflate main layout.
 		setContentView(R.layout.main);
 		
-		PropertyScraper scraper = new PropertyScraper(this);
+		Database db = new Database(this);
+		BartlebyRequester requester = new BartlebyRequester(getString(R.string.root_url), db);
 		
 		// Set up the mapView.
 		MapView mapView = (MapView) findViewById(R.id.mapview);
@@ -60,7 +56,7 @@ public class BartlebyActivity extends MapActivity {
 		locator = new Locator(this, mapView.getController());
 		
 		PropertyOverlay propertyOverlay = new PropertyOverlay(
-				this, getResources().getDrawable(R.drawable.marker), mapView, scraper);
+				this, getResources().getDrawable(R.drawable.marker), mapView, requester, db);
 		
 		geocoder = new AsyncGeocoder(this);
 		
@@ -82,19 +78,21 @@ public class BartlebyActivity extends MapActivity {
 		});
 		
 		// Set up the auto-complete address text view.
-		final AddressSearchView searchView = new AddressSearchView(this, geocoder,
+		search = new AddressSearchView(this, geocoder,
 				(AutoCompleteTextView) findViewById(R.id.autocomplete_address),
+				(ProgressBar) findViewById(R.id.autocomplete_progress), 
 				mapView, propertyOverlay);
 		
 		// This overlay catches all random clicks and creates new points.
 		FallThroughOverlay fallThrough = new FallThroughOverlay(this, geocoder,
 				mapView.getController(),
-				searchView, propertyOverlay);
+				search, propertyOverlay);
 		
 		// Add the overlays.
 		List<Overlay> overlays = mapView.getOverlays();
 		overlays.add(fallThrough);
 		overlays.add(propertyOverlay);
+		
 	}
 	
 	/**
@@ -127,6 +125,32 @@ public class BartlebyActivity extends MapActivity {
 		geocoder.pause();
 	}
 
+	
+	/**
+	 * Absorb search events
+	 * @return
+	 */
+	@Override
+	public boolean onSearchRequested() {
+		search.focus();
+		return true;
+	}
+	/**
+	 * Absorb search events
+	 * @param keyCode
+	 * @param repeatCount
+	 * @param event
+	 * @return
+	 */
+	/*@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		switch(keyCode) {
+		
+		}
+		onSe
+		return false;
+	}*/
+	
 	/**
 	 * Create the options menu.
 	 */

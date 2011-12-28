@@ -9,9 +9,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
-import android.text.util.Linkify;
 
-import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;
 import com.readystatesoftware.mapviewballoons.BalloonItemizedOverlay;
@@ -25,16 +23,19 @@ import com.readystatesoftware.mapviewballoons.BalloonOverlayView;
 class PropertyOverlay extends BalloonItemizedOverlay<Property> {
 	private final List<Property> items = new ArrayList<Property>();
 	private final Activity activity;
-	private final PropertyScraper scraper;
+	private final BartlebyRequester requester;
+	private final Database db;
 	
 	/**
 	 * 
 	 * @param marker The {@link Drawable} marker that will be used in the {@link ItemizedOverlay}.
 	 */
-	public PropertyOverlay(Activity activity, Drawable marker, MapView mapView, PropertyScraper scraper) {
+	public PropertyOverlay(Activity activity, Drawable marker, MapView mapView,
+			BartlebyRequester requester, Database db) {
 		super(boundCenter(marker), mapView);
 		setDrawFocusedItem(true);
-		this.scraper = scraper;
+		this.requester = requester;
+		this.db = db;
 		this.activity = activity;
 		
 		populate();
@@ -59,6 +60,11 @@ class PropertyOverlay extends BalloonItemizedOverlay<Property> {
 	
 	@Override
 	protected BalloonOverlayView<Property> createBalloonOverlayView() {
-		return new PropertyBalloon(activity, getBalloonBottomOffset(), scraper);
+		return new PropertyBalloon(activity, getBalloonBottomOffset(), requester, db);
+	}
+	
+	@Override
+	protected void hideBalloon() {
+		super.hideBalloon();
 	}
 }
