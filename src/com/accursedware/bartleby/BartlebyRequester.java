@@ -18,7 +18,6 @@ import net.caustic.Request;
 import net.caustic.Response;
 import net.caustic.Scraper;
 import net.caustic.http.Cookies;
-import net.caustic.http.HashtableCookies;
 import net.caustic.log.Loggable;
 import net.caustic.log.Logger;
 import net.caustic.log.MultiLog;
@@ -60,7 +59,7 @@ public class BartlebyRequester implements Loggable {
 			// TODO: shouldn't hit sqlite on UI thread
 			Map<String, String> addressData = address.getMap();
 			for(Map.Entry<String, String> entry : addressData.entrySet()) {
-				db.saveData(id, entry.getKey(), entry.getValue());
+				db.saveData(id, entry.getKey(), entry.getValue(), Database.INTERNAL);
 			}
 			
 			request(id, rootURL.resolve(address.getPath()).toString(),
@@ -69,7 +68,7 @@ public class BartlebyRequester implements Loggable {
 	}
 
 	public void request(String id, String instruction, String uri, String input, boolean force) {
-		StringMap tags = new CollectionStringMap(db.getData(id));
+		StringMap tags = new CollectionStringMap(db.getData(id, Database.INTERNAL));
 		Cookies cookies = db.getCookies(id);
 		request(new Request(id, instruction, uri, input, tags, cookies, force));
 	}
@@ -87,42 +86,49 @@ public class BartlebyRequester implements Loggable {
 	
 	public void finished(Request request, Response response) {		
 		log.i(StringUtils.quote(request.toString()) + " is finished: " + StringUtils.quote(response.serialize()));
-		if(response.values != null) {
-			handleFindResponse(request, response.name, response.values, response.uri, response.children);
-		} else if(response.wait){
-			handleWaitResponse(request, response.description);
-		} else if(response.content != null || response.cookies != null) {
-			handleLoadResponse(request, response.content, response.cookies, response.uri, response.children);
-		}else if(response.children != null) {
-			handleReferenceResponse(request, response.uri, response.children);
-		}  else if(response.missingTags != null) {
-			handleMissingTags(request, response.missingTags);
-		} else if(response.failedBecause != null) {
-			handleFailure(request, response.failedBecause);
-		} else {
+		switch(response.getStatus()) {
+		case Response.DONE:
+			Response.Done done = (Response.Done) response;
+			if(done.isFind()) {
+				handleFindResponse(request, (Response.DoneFind) response);
+			} else if(done.isLoad()) {
+				handleLoadResponse(request, (Response.DoneLoad) response);
+			} else {
+				handleReferenceResponse(request, done);
+			}
+			break;
+		case Response.WAIT:
+			handleWaitResponse(request, (Response.Wait) response);
+			break;
+		case Response.MISSING_TAGS:
+			handleMissingTags(request, (Response.MissingTags) response);
+			break;
+		case Response.FAILED:
+			handleFailure(request, (Response.Failed) response);
+			break;
+		default:
 			throw new RuntimeException("Invalid response: " + response.serialize());
 		}
 	}
 	
-	private void handleFindResponse(Request request, String name, String[] values, String uri, String[] children) {
-		log.i(StringUtils.quote(request.toString()) + " responded with find: " + StringUtils.quote(values));
-		final boolean isBranch = values.length > 1;
+	private void handleFindResponse(Request request, Response.DoneFind response) {
+		final boolean isBranch = response.getValues().length > 1;
 
-		for(String value : values) {
+		for(String value : response.getValues()) {
 			final String id;
 			
 			// if this is a branch, generate new id, branch cookies, and branch tags
 			if(isBranch) {
 				id = uuid();
-				db.saveRelationship(id, request.id, name, value);
+				db.saveRelationship(id, request.id, response.getName(), value);
 			} else {
 				id = request.id;
 			}
-			db.saveData(id, name, value);
+			db.saveData(id, response.getName(), value, visibility);
 			
 			//output.print(id, request.id, response.name, response.values[i]);
-			for(String child : children) {
-				request(id, child, uri, value, false);
+			for(String child : response.getChildren()) {
+				request(id, child, response.uri, value, false);
 			}
 		}
 		
@@ -133,35 +139,29 @@ public class BartlebyRequester implements Loggable {
 		}
 	}
 	
-	private void handleWaitResponse(Request request, String description) {
-		log.i(StringUtils.quote(request.toString()) + " responded with wait: " + StringUtils.quote(description));
-		db.saveWait(request.id, request.instruction, request.uri, description);
+	private void handleWaitResponse(Request request, Response.Wait response) {
+		db.saveWait(request.id, request.instruction, request.uri, response.getDescription());
 	}
 	
-	private void handleLoadResponse(Request request, String content, Cookies cookies, String uri, String[] children) {
-		log.i(StringUtils.quote(request.toString()) + " responded with load, adding cookies: " + cookies.toString());
-		db.saveCookies(request.id, cookies);
-		for(String child : children) {
-			request(request.id, child, uri, content, false);
+	private void handleLoadResponse(Request request, Response.DoneLoad response) {
+		db.saveCookies(request.id, response.getCookies());
+		for(String child : response.getChildren()) {
+			request(request.id, child, response.uri, response.getContent(), false);
 		}		
 	}
 	
-	private void handleReferenceResponse(Request request, String uri, String[] children) {
-		log.i(StringUtils.quote(request.toString()) + " responded with reference uri: " + StringUtils.quote(uri));
-		for(String child : children) {
+	private void handleReferenceResponse(Request request, Response.Done response) {
+		for(String child : response.getChildren()) {
 			// follow the response's uri, but keep everything else the same as request.
-			request(request.id, child, uri, request.input, request.force);
+			request(request.id, child, response.uri, request.input, request.force);
 		}
 	}
 	
-	private void handleMissingTags(Request request, String[] missingTags) {
-		log.i(StringUtils.quote(request.toString()) + " missing tags: " + StringUtils.quoteJoin(missingTags, ","));
-		db.saveMissingTags(request.id, request.instruction, request.uri, request.input, missingTags);
+	private void handleMissingTags(Request request, Response.MissingTags response) {
+		db.saveMissingTags(request.id, request.instruction, request.uri, request.input, response.getMissingTags());
 	}
 	
-	private void handleFailure(Request request, String failedBecause) {
-		log.i(StringUtils.quote(request.toString()) + " failed: " + StringUtils.quote(failedBecause));
-	}
+	private void handleFailure(Request request, Response.Failed response) { }
 
 	public void interrupt(Throwable why) {
 		log.e(why);

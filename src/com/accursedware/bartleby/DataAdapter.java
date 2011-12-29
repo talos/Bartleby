@@ -34,7 +34,7 @@ final class DataAdapter implements ListAdapter {
 	DataAdapter(Database db, BartlebyRequester requester, DataView dataView, String scope) {
 		this.requester = requester;
 		this.dataView = dataView;
-		data = db.getData(scope);
+		data = db.getData(scope, Database.EXTERNAL); // show externally visible data only
 		waits = db.getWait(scope);
 		children = db.getChildren(scope);
 		

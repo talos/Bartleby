@@ -31,7 +31,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 class Database extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "bartleby";
-	private static final int DATABASE_VERSION = 4;
+	private static final int DATABASE_VERSION = 5;
 	
 	private static final String DATA = "data";
 	private static final String RELATIONSHIPS = "relationships";
@@ -50,6 +50,15 @@ class Database extends SQLiteOpenHelper {
 	private static final String COOKIE = "cookie";
 	private static final String HOST = "host";
 	private static final String DESCRIPTION = "description";
+	private static final String INTERNAL_VISIBILITY = "internal";
+	private static final String EXTERNAL_VISIBILITY = "external";
+	//private static final String VISIBILITY = "visibility";
+	
+	/**
+	 * Bitmask flags for VISIBILITY.
+	 */
+	public static final int INTERNAL = 0x01;
+	public static final int EXTERNAL = 0x02;
 	
 	private SQLiteDatabase db;
 	private final List<DatabaseListener> listeners = new ArrayList<DatabaseListener>();
@@ -72,9 +81,11 @@ class Database extends SQLiteOpenHelper {
 		// data table
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + DATA +
 				" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-				SCOPE + " VARCHAR, " +
-				NAME  + " VARCHAR, " +
-				VALUE + " VARCHAR)");
+				SCOPE      + " VARCHAR, " +
+				NAME       + " VARCHAR, " +
+				VALUE      + " VARCHAR, " +
+				INTERNAL_VISIBILITY + " INTEGER, " +
+				EXTERNAL_VISIBILITY + " INTEGER)");
 		
 		// wait table
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + WAIT +
@@ -116,16 +127,26 @@ class Database extends SQLiteOpenHelper {
 		listeners.add(listener);
 	}
 	
-	void saveData(String scope, String name, String value) {
+	/**
+	 * 
+	 * @param scope The {@link String} scope of the saved data.
+	 * @param name The {@link String} name of the saved data.
+	 * @param value The {@link String} value of the saved data.
+	 * @param visibilityFlags The integer flags to determine the visibility of the
+	 * saved data.
+	 */
+	void saveData(String scope, String name, String value, int visibilityFlags) {
 		ContentValues cv = new ContentValues(3);
 		cv.put(SCOPE, scope);
 		cv.put(NAME, name);
 		cv.put(VALUE, value);
+		cv.put(INTERNAL_VISIBILITY, (visibilityFlags & INTERNAL) > 0 ? 1 : 0);
+		cv.put(EXTERNAL_VISIBILITY, (visibilityFlags & EXTERNAL) > 0 ? 1 : 0);
 		db.insert(DATA, null, cv);
 		
 		notifyListeners(scope);
 	}
-	
+
 	void saveRelationship(String scope, String source, String name, String value) {
 		ContentValues cv = new ContentValues(2);
 		cv.put(SOURCE, source);
@@ -181,6 +202,7 @@ class Database extends SQLiteOpenHelper {
 				SCOPE + " = ?", new String[] { scope },
 				null, null, null);
 		
+		StringMap data = null; // only pull this if we need it
 		Map<String, Request> waits = new HashMap<String, Request>(cursor.getCount(), 1);
 		while(cursor.moveToNext()) {
 			String instruction = cursor.getString(0);
@@ -199,10 +221,13 @@ class Database extends SQLiteOpenHelper {
 			} else {
 				name = instruction;
 			}
-				
+			
 			// input is null
+			if(data == null) {
+				data = new CollectionStringMap(getData(scope, INTERNAL));
+			}
 			waits.put(name, new Request(scope, instruction, uri, null,
-					new CollectionStringMap(getData(scope)), getCookies(scope), true));
+					data, getCookies(scope), true));
 		}
 		cursor.close();
 		return waits;
@@ -219,14 +244,14 @@ class Database extends SQLiteOpenHelper {
 				SCOPE + " = ?", new String[] { scope },
 				null, null, null);
 		
-		StringMap tags = new CollectionStringMap(getData(scope));
+		StringMap tags = new CollectionStringMap(getData(scope, INTERNAL));
 		Cookies cookies = null; // these are lazily loaded in the event that there actually are requests
 		List<Request> result = new ArrayList<Request>(cursor.getCount());
 		while(cursor.moveToNext()) {
 			String instruction = cursor.getString(0);
 			String uri = cursor.getString(1);
 			String input = cursor.getString(2);
-			
+
 			// only return requests that are no longer missing tags.
 			boolean isReady = true;
 			try {
@@ -253,14 +278,24 @@ class Database extends SQLiteOpenHelper {
 		return result;
 	}
 	
-	Map<String, String> getData(String scope) {
+	/**
+	 * 
+	 * @param scope The {@link String} scope of the data to be returned,
+	 * including parents.
+	 * @param visibilityFlags The visibility of the data to get.  All data
+	 * with at least one of these flags will be returned.
+	 * @return A {@link Map} of {@link String} keys to {@link String} values.
+	 * @see #EXTERNAL
+	 * @see #INTERNAL
+	 */
+	Map<String, String> getData(String scope, int visibilityFlags) {
 		Map<String, String> parentData = new HashMap<String, String>();
-		Map<String, String> thisData = getDataInScope(scope);
+		Map<String, String> thisData = getDataInScope(scope, visibilityFlags);
 		
 		// loop through source scopes.
 		while((scope = getSource(scope)) != null) {
 			// This ensures that child keys overwrite parent keys.
-			Map<String, String> interData = getDataInScope(scope);
+			Map<String, String> interData = getDataInScope(scope, visibilityFlags);
 			interData.putAll(parentData);
 			parentData = interData;
 		}
@@ -341,12 +376,17 @@ class Database extends SQLiteOpenHelper {
 		return cookies;
 	}
 	
-	Map<String, String> getDataInScope(String scope) {
+	Map<String, String> getDataInScope(String scope, int visibilityFlags) {
 		Map<String, String> data = new HashMap<String, String>();
 
 		Cursor cursor = db.query(
 				DATA, new String[] { NAME, VALUE },
-				SCOPE + " = ?", new String[] { scope },
+				SCOPE + " = ? AND " + INTERNAL_VISIBILITY + " >= ? AND " + EXTERNAL_VISIBILITY + " >= ?",
+				new String[] {
+						scope,
+						(visibilityFlags & INTERNAL) > 0 ? "1" : "0",
+						(visibilityFlags & EXTERNAL) > 0 ? "1" : "0"
+				},
 				null, null, null);
 
 		while(cursor.moveToNext()) {
