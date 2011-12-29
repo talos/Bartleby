@@ -4,8 +4,8 @@
  */
 package com.accursedware.bartleby;
 
+import android.app.Activity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -14,7 +14,7 @@ import android.widget.TextView;
  * @author talos
  *
  */
-class GenericDataView implements DatabaseListener {
+class DataView implements DatabaseListener {
 
 	private final Database db;
 	
@@ -24,14 +24,16 @@ class GenericDataView implements DatabaseListener {
 	private final ListView data;
 	private final BartlebyRequester requester;
 	private final ScrollView view;
+	private final Activity activity;
 	//private final LinearLayout view;
 	
-	GenericDataView(Database db, BartlebyRequester requester, ViewGroup parent) {
+	DataView(Activity activity, Database db, BartlebyRequester requester) {
 		this.db = db;
 		this.db.addListener(this);
+		this.activity = activity;
 		
-		View.inflate(parent.getContext(), R.layout.generic_data_view, parent);
-		view = (ScrollView) parent.findViewById(R.id.generic_data_view);
+		view = (ScrollView) View.inflate(activity, R.layout.data_view, null);
+		//view = (ScrollView) parent.findViewById(R.id.generic_data_view);
 		//view = (LinearLayout) View.inflate(parent.getContext(), R.layout.generic_data_view, parent);
 		
 		this.title = (TextView) view.findViewById(R.id.title);
@@ -41,10 +43,8 @@ class GenericDataView implements DatabaseListener {
 
 	@Override
 	public void updated(String updatedScope) {
-		if(scope != null) {
-			if(scope.equals(updatedScope)) {
-				redraw();
-			}
+		if(updatedScope.equals(this.scope)) {
+			redraw();
 		}
 	}
 	
@@ -53,14 +53,28 @@ class GenericDataView implements DatabaseListener {
 	}
 	
 	void setScope(String scope, String title) {
-		if(!this.scope.equals(scope)) {
+		if(!scope.equals(this.scope)) {
 			this.scope = scope;
-			redraw();
 			this.title.setText(title);
+			redraw();
 		}
 	}
 	
 	private void redraw() {
-		data.setAdapter(new DataAdapter(db, requester, this, scope));
+		final DataAdapter adapter = new DataAdapter(db, requester, this, scope);
+		
+		activity.runOnUiThread(new Runnable() {
+			public void run() {
+				data.setAdapter(adapter);
+			}
+		});
+	}
+
+	/**
+	 * 
+	 */
+	public void expand() {
+		// TODO Auto-generated method stub
+		
 	}
 }

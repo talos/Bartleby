@@ -7,7 +7,6 @@ package com.accursedware.bartleby;
 import android.content.Context;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,8 +17,8 @@ import android.widget.TextView;
  */
 class ChildRow {
 
-	static LinearLayout initialize(Context context, ViewGroup parent, String value, GenericDataView dataView, String childID) {
-		LinearLayout view = (LinearLayout) View.inflate(context, R.layout.child_row, parent);
+	static LinearLayout initialize(Context context, String value, DataView dataView, String childID) {
+		LinearLayout view = (LinearLayout) View.inflate(context, R.layout.child_row, null);
 		TextView valueView = (TextView) view.findViewById(R.id.value);
 		valueView.setText(value);
 		ImageButton goToChildButton = (ImageButton) view.findViewById(R.id.go_to_child_button);
@@ -28,10 +27,10 @@ class ChildRow {
 	}
 	
 	private static class Listener implements OnClickListener {
-		private final GenericDataView dataView;
+		private final DataView dataView;
 		private final String childID;
 		private final String value;
-		private Listener(GenericDataView dataView, String childID, String value) {
+		private Listener(DataView dataView, String childID, String value) {
 			this.dataView = dataView;
 			this.childID = childID;
 			this.value = value;
@@ -39,6 +38,7 @@ class ChildRow {
 		@Override
 		public void onClick(View v) {
 			dataView.setScope(childID, value);
+			dataView.expand();
 		}
 	}
 }

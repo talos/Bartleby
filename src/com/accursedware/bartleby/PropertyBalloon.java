@@ -4,10 +4,12 @@
  */
 package com.accursedware.bartleby;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.readystatesoftware.mapviewballoons.BalloonOverlayView;
 
-import android.app.Activity;
-import android.view.View;
+import android.content.Context;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,38 +18,40 @@ import android.widget.TextView;
  * @author talos
  *
  */
-class PropertyBalloon extends BalloonOverlayView<Property> implements DatabaseListener {
+class PropertyBalloon extends BalloonOverlayView<Property> {
 	
-	private final Activity activity;
-	private final TextView title;
+	//private final Activity activity;
+	//private final TextView title;
 	private final BartlebyRequester requester;
 	private final LinearLayout innerLayout;
-	private final GenericDataView dataView;
-	private final LinearLayout loading;
+	private final DataView dataView;
+	//private final LinearLayout loading;
 	
 	/**
 	 * The currently displayed scope
 	 */
-	private BartlebyAddress curAddress;
+	//private BartlebyAddress curAddress;
 	
 	/**
 	 * @param context
 	 * @param balloonBottomOffset
 	 */
-	public PropertyBalloon(Activity activity, int balloonBottomOffset, BartlebyRequester requester,
-			Database db) {
-		super(activity, balloonBottomOffset);
-		db.addListener(this);
+	public PropertyBalloon(Context context, int balloonBottomOffset,
+			BartlebyRequester requester, DataView dataView) {
+		super(context, balloonBottomOffset);
+		//db.addListener(this);
 		
-		this.activity = activity;
+		//this.activity = activity;
 		this.requester = requester;
-		title = (TextView) findViewById(R.id.balloon_item_title);
+		//title = (TextView) findViewById(R.id.balloon_item_title);
+		this.dataView = dataView;
 		//snippet = (TextView) findViewById(R.id.balloon_item_snippet);
 		
 		innerLayout = (LinearLayout) findViewById(R.id.balloon_inner_layout);
 		
-		dataView = new GenericDataView(db, requester, innerLayout);
-		loading = (LinearLayout) View.inflate(getContext(), R.layout.loading, innerLayout);
+		//dataView = new GenericDataView(db, requester, innerLayout);
+		innerLayout.addView(dataView.getUnderlyingView());
+		//loading = (LinearLayout) View.inflate(getContext(), R.layout.loading, innerLayout);
 	}
 	
 	/**
@@ -58,31 +62,15 @@ class PropertyBalloon extends BalloonOverlayView<Property> implements DatabaseLi
 		super.setData(item);
 		
 		BartlebyAddress address = item.getAddress();
-		curAddress = address;
+		//curAddress = address;
 		
-		title.setVisibility(VISIBLE);
-		title.setText(address.getLocalString());
+		//title.setVisibility(VISIBLE);
+		//title.setText(address.getLocalString());
 		
-		dataView.getUnderlyingView().setVisibility(GONE);
-		loading.setVisibility(VISIBLE);
+		//dataView.getUnderlyingView().setVisibility(GONE);
+		//loading.setVisibility(VISIBLE);
+		
+		dataView.setScope(item.getAddress().getID().toString(), address.getLocalString());
 		requester.request(address);
-	}
-
-	/* (non-Javadoc)
-	 * @see com.accursedware.bartleby.DatabaseListener#updated(java.lang.String)
-	 */
-	@Override
-	public void updated(final String updatedID) {
-			
-		// if we know about it, show about it.
-		activity.runOnUiThread(new Runnable() {
-			public void run() {
-				if(updatedID.equals(curAddress.getID().toString())) {
-					
-					dataView.getUnderlyingView().setVisibility(VISIBLE);
-					loading.setVisibility(GONE);
-				}
-			}
-		});
 	}
 }

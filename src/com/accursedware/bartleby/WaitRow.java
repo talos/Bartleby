@@ -18,8 +18,8 @@ import android.widget.TextView;
  *
  */
 class WaitRow {
-	static LinearLayout initialize(Context context, ViewGroup parent, String name, BartlebyRequester requester, Request request) {
-		LinearLayout view = (LinearLayout) View.inflate(context, R.layout.wait_row, parent);
+	static LinearLayout initialize(Context context, String name, BartlebyRequester requester, Request request) {
+		LinearLayout view = (LinearLayout) View.inflate(context, R.layout.wait_row, null);
 		TextView nameView = (TextView) view.findViewById(R.id.name);
 		nameView.setText(name);
 		ImageButton loadButton = (ImageButton) view.findViewById(R.id.load_button);

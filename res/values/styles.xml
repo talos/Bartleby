@@ -6,4 +6,8 @@
     	<item name="android:textSize">10dp</item>
     </style>
     
+    <style name="DataRow">
+    	<item name="android:textSize">10dp</item>
+    </style>
+    
 </resources>

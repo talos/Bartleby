@@ -177,7 +177,7 @@ public final class BartlebyAddress {
 	/**
 	 * @return
 	 */
-	public CharSequence getLocalString() {
+	public String getLocalString() {
 		return this.number + ' ' + this.street;
 	}
 }

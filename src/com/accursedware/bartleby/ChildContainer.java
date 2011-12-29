@@ -21,8 +21,8 @@ import android.widget.ListView;
  */
 class ChildContainer {
 	
-	static LinearLayout initialize(Context context, ViewGroup parent, String name, GenericDataView dataView, Map<String, String> children) {
-		LinearLayout view = (LinearLayout) View.inflate(context, R.layout.child_container, parent);
+	static LinearLayout initialize(Context context, String name, DataView dataView, Map<String, String> children) {
+		LinearLayout view = (LinearLayout) View.inflate(context, R.layout.child_container, null);
 		ListView childrenListView = (ListView) view.findViewById(R.id.children);
 		childrenListView.setAdapter(new ChildAdapter(dataView, children));
 		return view;
@@ -32,8 +32,8 @@ class ChildContainer {
 
 		private final TreeMap<String, String> children;
 		private final String[] keys;
-		private final GenericDataView dataView;
-		private ChildAdapter(GenericDataView dataView, Map<String, String> children) {
+		private final DataView dataView;
+		private ChildAdapter(DataView dataView, Map<String, String> children) {
 			this.dataView = dataView;
 			// sorted children.
 			this.children = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
@@ -65,7 +65,7 @@ class ChildContainer {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			String childID = keys[position];
 			String value = children.get(childID);
-			return ChildRow.initialize(parent.getContext(), parent, value, dataView, childID);
+			return ChildRow.initialize(parent.getContext(), value, dataView, childID);
 		}
 		
 		@Override

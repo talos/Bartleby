@@ -16,7 +16,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.widget.AutoCompleteTextView;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.ViewSwitcher;
 
 import com.accursedware.bartleby.geocoding.AsyncGeocoder;
 import com.accursedware.bartleby.util.NetworkUtils;
@@ -48,18 +50,23 @@ public class BartlebyActivity extends MapActivity {
 
 		// Inflate main layout.
 		setContentView(R.layout.main);
-		
+
 		Database db = new Database(this);
 		BartlebyRequester requester = new BartlebyRequester(getString(R.string.root_url), db);
 		requester.register(new AndroidLogger(this));
 		
+		// View switcher
+		ViewSwitcher viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
+
 		// Set up the mapView.
 		MapView mapView = (MapView) findViewById(R.id.mapview);
 		mapView.setBuiltInZoomControls(true);
 		locator = new Locator(this, mapView.getController());
 		
+		DataView dataView = new DataView(this, db, requester);
+		
 		PropertyOverlay propertyOverlay = new PropertyOverlay(
-				this, getResources().getDrawable(R.drawable.marker), mapView, requester, db);
+				this, getResources().getDrawable(R.drawable.marker), mapView, requester, dataView);
 		
 		geocoder = new AsyncGeocoder(this);
 		

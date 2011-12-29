@@ -1,50 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/master"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
-    <RelativeLayout android:id="@+id/autocomplete_holder"
-    				android:layout_height="wrap_content"
-					android:layout_width="fill_parent"
-					android:layout_alignParentTop="true"
- 					style="@android:style/ButtonBar">
-		<AutoCompleteTextView android:layout_height="wrap_content"
-					android:layout_width="fill_parent"
-					android:id="@+id/autocomplete_address"
-					android:completionThreshold="@integer/completion_threshold"
-					android:inputType="textAutoComplete"
-					android:hint="@string/address_hint"
-					android:selectAllOnFocus="true"
-					android:layout_alignParentTop="true">
-		</AutoCompleteTextView>
-		
-		<ProgressBar android:id="@+id/autocomplete_progress"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_centerVertical="true"
-					android:layout_alignParentRight="true"
-					android:paddingRight="5dp"
-					android:visibility="invisible"
-			        style="@android:style/Widget.ProgressBar.Small.Inverse"
-					android:indeterminate="true"/>
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/view_switcher"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" >
+	<RelativeLayout
+		android:id="@+id/map_layout"
+	    android:orientation="vertical"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent" >
+	    <RelativeLayout android:id="@+id/autocomplete_holder"
+	    				android:layout_height="wrap_content"
+						android:layout_width="fill_parent"
+						android:layout_alignParentTop="true"
+	 					style="@android:style/ButtonBar">
+			<AutoCompleteTextView android:layout_height="wrap_content"
+						android:layout_width="fill_parent"
+						android:id="@+id/autocomplete_address"
+						android:completionThreshold="@integer/completion_threshold"
+						android:inputType="textAutoComplete"
+						android:hint="@string/address_hint"
+						android:selectAllOnFocus="true"
+						android:layout_alignParentTop="true">
+			</AutoCompleteTextView>
+			
+			<ProgressBar android:id="@+id/autocomplete_progress"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_centerVertical="true"
+						android:layout_alignParentRight="true"
+						android:paddingRight="5dp"
+						android:visibility="invisible"
+				        style="@android:style/Widget.ProgressBar.Small.Inverse"
+						android:indeterminate="true"/>
+		</RelativeLayout>
+		<!--  android:text="@string/lookup_button"-->
+		<!--  <ImageButton 
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content" 
+				android:id="@+id/button_lookup"
+				android:src="@drawable/go_button_selector"
+				android:layout_alignParentTop="true"
+				android:layout_alignParentRight="true"></ImageButton> -->
+		<com.google.android.maps.MapView android:layout_height="wrap_content"
+				android:focusable="true"
+				android:clickable="true"
+				android:id="@+id/mapview"
+				android:layout_width="fill_parent"
+				android:layout_below="@+id/autocomplete_holder"
+				android:layout_alignParentBottom="true"
+				android:apiKey="@string/google_maps_api_key"
+				></com.google.android.maps.MapView>
 	</RelativeLayout>
-	<!--  android:text="@string/lookup_button"-->
-	<!--  <ImageButton 
-			android:layout_height="wrap_content"
-			android:layout_width="wrap_content" 
-			android:id="@+id/button_lookup"
-			android:src="@drawable/go_button_selector"
-			android:layout_alignParentTop="true"
-			android:layout_alignParentRight="true"></ImageButton> -->
-	<com.google.android.maps.MapView android:layout_height="wrap_content"
-			android:focusable="true"
-			android:clickable="true"
-			android:id="@+id/mapview"
-			android:layout_width="fill_parent"
-			android:layout_below="@+id/autocomplete_holder"
-			android:layout_alignParentBottom="true"
-			android:apiKey="@string/google_maps_api_key"
-			></com.google.android.maps.MapView>
-</RelativeLayout>
+	<LinearLayout android:id="@+id/data_layout"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent" />
+</ViewSwitcher>

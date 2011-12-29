@@ -24,19 +24,19 @@ class PropertyOverlay extends BalloonItemizedOverlay<Property> {
 	private final List<Property> items = new ArrayList<Property>();
 	private final Activity activity;
 	private final BartlebyRequester requester;
-	private final Database db;
+	private final DataView dataView;
 	
 	/**
 	 * 
 	 * @param marker The {@link Drawable} marker that will be used in the {@link ItemizedOverlay}.
 	 */
 	public PropertyOverlay(Activity activity, Drawable marker, MapView mapView,
-			BartlebyRequester requester, Database db) {
+			BartlebyRequester requester, DataView dataView) {
 		super(boundCenter(marker), mapView);
 		setDrawFocusedItem(true);
 		this.requester = requester;
-		this.db = db;
 		this.activity = activity;
+		this.dataView = dataView;
 		
 		populate();
 	}
@@ -60,7 +60,7 @@ class PropertyOverlay extends BalloonItemizedOverlay<Property> {
 	
 	@Override
 	protected BalloonOverlayView<Property> createBalloonOverlayView() {
-		return new PropertyBalloon(activity, getBalloonBottomOffset(), requester, db);
+		return new PropertyBalloon(activity, getBalloonBottomOffset(), requester, dataView);
 	}
 	
 	@Override

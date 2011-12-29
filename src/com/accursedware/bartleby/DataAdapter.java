@@ -29,9 +29,9 @@ final class DataAdapter implements ListAdapter {
 	private final TreeMap<String, Integer> dataTypes = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
 	private final String[] keys;
 	private final BartlebyRequester requester;
-	private final GenericDataView dataView;
+	private final DataView dataView;
 	
-	DataAdapter(Database db, BartlebyRequester requester, GenericDataView dataView, String scope) {
+	DataAdapter(Database db, BartlebyRequester requester, DataView dataView, String scope) {
 		this.requester = requester;
 		this.dataView = dataView;
 		data = db.getData(scope);
@@ -91,13 +91,13 @@ final class DataAdapter implements ListAdapter {
 		final LinearLayout row;
 		switch(type) {
 		case DATA_ROW:
-			row = DataRow.initialize(context, parent, name, data.get(name));
+			row = DataRow.initialize(context, name, data.get(name));
 			break;
 		case WAIT_ROW:
-			row = WaitRow.initialize(context, parent, name, requester, waits.get(name));
+			row = WaitRow.initialize(context, name, requester, waits.get(name));
 			break;
 		case CHILD_CONTAINER:
-			row = ChildContainer.initialize(context, parent, name, dataView, children.get(name));
+			row = ChildContainer.initialize(context, name, dataView, children.get(name));
 			break;
 		default:
 			throw new IllegalArgumentException("Illegal view type: " + type);
@@ -133,13 +133,13 @@ final class DataAdapter implements ListAdapter {
 
 	@Override
 	public boolean areAllItemsEnabled() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean isEnabled(int position) {
 		if(keys.length > position) {
-			return true;
+			return false;
 		} else {
 			throw new ArrayIndexOutOfBoundsException();
 		}

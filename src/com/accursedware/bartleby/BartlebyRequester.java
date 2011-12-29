@@ -5,8 +5,10 @@
 package com.accursedware.bartleby;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,6 +37,7 @@ public class BartlebyRequester implements Loggable {
 	
 	private final Scraper scraper = new DefaultScraper();
 	private final URI rootURL;
+	private final Set<String> requestedAddresses = new HashSet<String>();
 	
 	private final Database db;
 	private final MultiLog log = new MultiLog();
@@ -51,14 +54,18 @@ public class BartlebyRequester implements Loggable {
 	public void request(BartlebyAddress address) {
 		String id = address.getID().toString();
 		
-		// TODO: shouldn't hit sqlite on UI thread
-		Map<String, String> addressData = address.getMap();
-		for(Map.Entry<String, String> entry : addressData.entrySet()) {
-			db.saveData(id, entry.getKey(), entry.getValue());
+		// only request addresses that have not already been requested
+		if(!requestedAddresses.contains(id)) {
+			
+			// TODO: shouldn't hit sqlite on UI thread
+			Map<String, String> addressData = address.getMap();
+			for(Map.Entry<String, String> entry : addressData.entrySet()) {
+				db.saveData(id, entry.getKey(), entry.getValue());
+			}
+			
+			request(id, rootURL.resolve(address.getPath()).toString(),
+					"", null, true); // immediately force load on these.
 		}
-		
-		request(id, rootURL.resolve(address.getPath()).toString(),
-				"", null, true); // immediately force load on these.
 	}
 
 	public void request(String id, String instruction, String uri, String input, boolean force) {

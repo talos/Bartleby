@@ -15,8 +15,8 @@ import android.widget.TextView;
  *
  */
 class DataRow {
-	static LinearLayout initialize(Context context, ViewGroup parent, String name, String value) {
-		LinearLayout row = (LinearLayout) View.inflate(context, R.layout.data_row, parent);
+	static LinearLayout initialize(Context context, String name, String value) {
+		LinearLayout row = (LinearLayout) View.inflate(context, R.layout.data_row, null);
 		TextView nameView = (TextView) row.findViewById(R.id.name);
 		nameView.setText(name);
 		TextView valueView = (TextView) row.findViewById(R.id.value);

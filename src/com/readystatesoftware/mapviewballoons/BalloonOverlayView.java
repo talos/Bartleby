@@ -46,9 +46,9 @@ import com.google.android.maps.OverlayItem;
  */
 public class BalloonOverlayView<Item extends OverlayItem> extends FrameLayout {
 
-	private LinearLayout layout;
-	private TextView title;
-	private TextView snippet;
+	private final LinearLayout layout;
+	//private final TextView title;
+	//private final TextView snippet;
 
 	/**
 	 * Create a new BalloonOverlayView.
@@ -68,8 +68,8 @@ public class BalloonOverlayView<Item extends OverlayItem> extends FrameLayout {
 		LayoutInflater inflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View v = inflater.inflate(R.layout.balloon_overlay, layout);
-		title = (TextView) v.findViewById(R.id.balloon_item_title);
-		snippet = (TextView) v.findViewById(R.id.balloon_item_snippet);
+		//title = (TextView) v.findViewById(R.id.balloon_item_title);
+		//snippet = (TextView) v.findViewById(R.id.balloon_item_snippet);
 		
 		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -85,7 +85,7 @@ public class BalloonOverlayView<Item extends OverlayItem> extends FrameLayout {
 	 * (title and snippet). 
 	 */
 	public void setData(Item item) {
-		
+		/*
 		layout.setVisibility(VISIBLE);
 		if (item.getTitle() != null) {
 			title.setVisibility(VISIBLE);
@@ -98,7 +98,7 @@ public class BalloonOverlayView<Item extends OverlayItem> extends FrameLayout {
 			snippet.setText(item.getSnippet());
 		} else {
 			snippet.setVisibility(GONE);
-		}
+		}*/
 		
 	}
 
