@@ -4,6 +4,8 @@
  */
 package com.accursedware.bartleby;
 
+import java.util.Map;
+
 import net.caustic.android.AndroidRequester;
 import net.caustic.android.DataView;
 
@@ -70,6 +72,8 @@ class PropertyBalloon extends BalloonOverlayView<Property> {
 		//loading.setVisibility(VISIBLE);
 		
 		dataView.setScope(item.getAddress().getID().toString(), address.getLocalString());
-		requester.request(address);
+		
+		// TODO this needs to be requested!
+		//requester.request(address);
 	}
 }

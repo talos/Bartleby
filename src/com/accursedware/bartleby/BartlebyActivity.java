@@ -77,7 +77,7 @@ public class BartlebyActivity extends MapActivity {
 		
 		// Set up the server pinger.
 		final Activity activity = this;
-		pinger = new ServerPinger(getString(R.string.root_url), new ServerPingerListener() {
+		/*pinger = new ServerPinger(getString(R.string.root_url), new ServerPingerListener() {
 			@Override
 			public boolean onAlive() {
 				return false; // stop making requests if the server is alive.
@@ -90,7 +90,7 @@ public class BartlebyActivity extends MapActivity {
 				return true; // keep making requests
 			}
 			
-		});
+		});*/
 		
 		// Set up the auto-complete address text view.
 		search = new AddressSearchView(this, geocoder,
