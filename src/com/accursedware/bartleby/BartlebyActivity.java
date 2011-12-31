@@ -6,6 +6,11 @@ package com.accursedware.bartleby;
 
 import java.util.List;
 
+import net.caustic.android.AndroidRequester;
+import net.caustic.android.DataView;
+import net.caustic.android.Database;
+import net.caustic.android.ServerPinger;
+import net.caustic.android.ServerPingerListener;
 import net.caustic.log.AndroidLogger;
 
 import android.app.Activity;
@@ -52,7 +57,7 @@ public class BartlebyActivity extends MapActivity {
 		setContentView(R.layout.main);
 
 		Database db = new Database(this);
-		BartlebyRequester requester = new BartlebyRequester(getString(R.string.root_url), db);
+		AndroidRequester requester = new AndroidRequester(getString(R.string.root_url), db);
 		requester.register(new AndroidLogger(this));
 		
 		// View switcher

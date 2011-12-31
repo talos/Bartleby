@@ -4,14 +4,13 @@
  */
 package com.accursedware.bartleby;
 
-import java.util.HashSet;
-import java.util.Set;
+import net.caustic.android.AndroidRequester;
+import net.caustic.android.DataView;
 
 import com.readystatesoftware.mapviewballoons.BalloonOverlayView;
 
 import android.content.Context;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 /**
  * This view shows a balloon with the currently selected property's data.
@@ -22,7 +21,7 @@ class PropertyBalloon extends BalloonOverlayView<Property> {
 	
 	//private final Activity activity;
 	//private final TextView title;
-	private final BartlebyRequester requester;
+	private final AndroidRequester requester;
 	private final LinearLayout innerLayout;
 	private final DataView dataView;
 	//private final LinearLayout loading;
@@ -37,7 +36,7 @@ class PropertyBalloon extends BalloonOverlayView<Property> {
 	 * @param balloonBottomOffset
 	 */
 	public PropertyBalloon(Context context, int balloonBottomOffset,
-			BartlebyRequester requester, DataView dataView) {
+			AndroidRequester requester, DataView dataView) {
 		super(context, balloonBottomOffset);
 		//db.addListener(this);
 		

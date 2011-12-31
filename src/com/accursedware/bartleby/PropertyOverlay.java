@@ -7,6 +7,9 @@ package com.accursedware.bartleby;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.caustic.android.AndroidRequester;
+import net.caustic.android.DataView;
+
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 
@@ -23,7 +26,7 @@ import com.readystatesoftware.mapviewballoons.BalloonOverlayView;
 class PropertyOverlay extends BalloonItemizedOverlay<Property> {
 	private final List<Property> items = new ArrayList<Property>();
 	private final Activity activity;
-	private final BartlebyRequester requester;
+	private final AndroidRequester requester;
 	private final DataView dataView;
 	
 	/**
@@ -31,7 +34,7 @@ class PropertyOverlay extends BalloonItemizedOverlay<Property> {
 	 * @param marker The {@link Drawable} marker that will be used in the {@link ItemizedOverlay}.
 	 */
 	public PropertyOverlay(Activity activity, Drawable marker, MapView mapView,
-			BartlebyRequester requester, DataView dataView) {
+			AndroidRequester requester, DataView dataView) {
 		super(boundCenter(marker), mapView);
 		setDrawFocusedItem(true);
 		this.requester = requester;

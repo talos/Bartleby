@@ -9,12 +9,12 @@ package net.caustic.android;
 
 public final class R {
     public static final class array {
-        public static final int about_paragraphs=0x7f070000;
+        public static final int about_paragraphs=0x7f080000;
     }
     public static final class attr {
     }
     public static final class bool {
-        public static final int debug=0x7f050000;
+        public static final int debug=0x7f060000;
     }
     public static final class drawable {
         public static final int balloon_overlay_bg_selector=0x7f020000;
@@ -55,13 +55,13 @@ public final class R {
     public static final class integer {
         /**  How many milliseconds to wait before updating autocomplete list. 
          */
-        public static final int autocomplete_delay=0x7f060002;
+        public static final int autocomplete_delay=0x7f070002;
         /**  How many characters before beginning to autocomplete the searchview 
          */
-        public static final int completion_threshold=0x7f060000;
+        public static final int completion_threshold=0x7f070000;
         /**  How far to zoom in maps automatically towards current location 
          */
-        public static final int zoom_to_level=0x7f060001;
+        public static final int zoom_to_level=0x7f070001;
     }
     public static final class layout {
         public static final int about=0x7f030000;
@@ -108,7 +108,8 @@ public final class R {
         public static final int root_url=0x7f040006;
     }
     public static final class style {
-        public static final int DataRow=0x7f080001;
-        public static final int Version=0x7f080000;
+        public static final int DataRow=0x7f050000;
+        public static final int DataTitle=0x7f050001;
+        public static final int Version=0x7f050002;
     }
 }
