@@ -53,7 +53,6 @@ public final class AsyncGeocoder {
 	
 	private Future<?> lastSearch;
 	private BaseAsyncGeocoderListener lastListener;
-
 	
 	private final ExecutorService worker = Executors.newSingleThreadExecutor();
 	

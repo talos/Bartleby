@@ -6,11 +6,11 @@ package com.accursedware.bartleby;
 
 import java.util.List;
 
-import net.caustic.android.AndroidRequester;
-import net.caustic.android.DataView;
-import net.caustic.android.Database;
-import net.caustic.android.ServerPinger;
-import net.caustic.android.ServerPingerListener;
+import net.caustic.android.activity.AndroidRequester;
+import net.caustic.android.activity.DataView;
+import net.caustic.android.activity.Database;
+import net.caustic.android.activity.ServerPinger;
+import net.caustic.android.activity.ServerPingerListener;
 import net.caustic.log.AndroidLogger;
 
 import android.app.Activity;
@@ -42,7 +42,7 @@ public class BartlebyActivity extends MapActivity {
 	private static final int NO_INTERNET_DIALOG_ID = 2;
 	
 	private AsyncGeocoder geocoder;
-	private ServerPinger pinger;
+	//private ServerPinger pinger;
 	private Locator locator;
 	private AddressSearchView search;
 	
@@ -52,23 +52,25 @@ public class BartlebyActivity extends MapActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		
 		// Inflate main layout.
 		setContentView(R.layout.main);
 
-		Database db = new Database(this);
-		AndroidRequester requester = new AndroidRequester(getString(R.string.root_url), db);
+		//Database db = new Database(this);
+		//AndroidRequester requester = new AndroidRequester(getString(R.string.root_url), db);
 		requester.register(new AndroidLogger(this));
-		
-		// View switcher
-		ViewSwitcher viewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
 
 		// Set up the mapView.
 		MapView mapView = (MapView) findViewById(R.id.mapview);
 		mapView.setBuiltInZoomControls(true);
 		locator = new Locator(this, mapView.getController());
 		
-		DataView dataView = new DataView(this, db, requester);
+		//DataView dataView = new DataView(this, db, requester);
 		
 		PropertyOverlay propertyOverlay = new PropertyOverlay(
 				this, getResources().getDrawable(R.drawable.marker), mapView, requester, dataView);
@@ -117,7 +119,7 @@ public class BartlebyActivity extends MapActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		pinger.ping();
+		//pinger.ping();
 		geocoder.resume(this);
 		if(!NetworkUtils.isNetworkAvailable(this)) {
 			showDialog(NO_INTERNET_DIALOG_ID);
@@ -136,10 +138,9 @@ public class BartlebyActivity extends MapActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		pinger.stop();
+		//pinger.stop();
 		geocoder.pause();
 	}
-
 	
 	/**
 	 * Absorb search events

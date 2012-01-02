@@ -7,10 +7,11 @@ package com.accursedware.bartleby;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.caustic.android.AndroidRequester;
-import net.caustic.android.DataView;
+import net.caustic.android.activity.AndroidRequester;
+import net.caustic.android.activity.DataView;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.graphics.drawable.Drawable;
 
 import com.google.android.maps.ItemizedOverlay;
@@ -63,6 +64,7 @@ class PropertyOverlay extends BalloonItemizedOverlay<Property> {
 	
 	@Override
 	protected BalloonOverlayView<Property> createBalloonOverlayView() {
+		PendingIntent.getBroadcast(context, requestCode, intent, flags)
 		return new PropertyBalloon(activity, getBalloonBottomOffset(), requester, dataView);
 	}
 	

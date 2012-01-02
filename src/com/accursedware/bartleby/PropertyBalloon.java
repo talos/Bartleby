@@ -6,8 +6,8 @@ package com.accursedware.bartleby;
 
 import java.util.Map;
 
-import net.caustic.android.AndroidRequester;
-import net.caustic.android.DataView;
+import net.caustic.android.activity.AndroidRequester;
+import net.caustic.android.activity.DataView;
 
 import com.readystatesoftware.mapviewballoons.BalloonOverlayView;
 
