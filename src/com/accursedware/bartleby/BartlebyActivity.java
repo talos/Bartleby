@@ -6,24 +6,26 @@ package com.accursedware.bartleby;
 
 import java.util.List;
 
-import net.caustic.android.activity.AndroidRequester;
-import net.caustic.android.activity.DataView;
-import net.caustic.android.activity.Database;
-import net.caustic.android.activity.ServerPinger;
-import net.caustic.android.activity.ServerPingerListener;
+import net.caustic.android.activity.CausticAndroidButtons;
+import net.caustic.android.activity.DataAdapter;
+import net.caustic.android.activity.DataUpdateReceiver;
+import net.caustic.android.service.CausticIntent;
+import net.caustic.android.service.CausticIntent.CausticForceIntent;
+import net.caustic.android.service.CausticIntent.CausticRefreshIntent;
+import net.caustic.android.service.CausticIntentFilter;
 import net.caustic.log.AndroidLogger;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
+import android.view.View;
 import android.widget.AutoCompleteTextView;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
-import android.widget.ViewSwitcher;
 
 import com.accursedware.bartleby.geocoding.AsyncGeocoder;
 import com.accursedware.bartleby.util.NetworkUtils;
@@ -35,7 +37,7 @@ import com.google.android.maps.Overlay;
  * @author talos
  *
  */
-public class BartlebyActivity extends MapActivity {
+public class BartlebyActivity extends MapActivity implements CausticAndroidButtons {
 	
 	private static final int ABOUT_DIALOG_ID = 0;
 	private static final int NO_LOCATOR_DIALOG_ID = 1;
@@ -45,6 +47,10 @@ public class BartlebyActivity extends MapActivity {
 	//private ServerPinger pinger;
 	private Locator locator;
 	private AddressSearchView search;
+	
+	private DataAdapter adapter;
+	private DataUpdateReceiver receiver;
+	private IntentFilter filter;
 	
 	/**
 	 * Set up app basics, inflate views etc.
@@ -61,9 +67,9 @@ public class BartlebyActivity extends MapActivity {
 		// Inflate main layout.
 		setContentView(R.layout.main);
 
-		//Database db = new Database(this);
-		//AndroidRequester requester = new AndroidRequester(getString(R.string.root_url), db);
-		requester.register(new AndroidLogger(this));
+		adapter = new DataAdapter();
+		receiver = new DataUpdateReceiver(adapter);
+		filter = new CausticIntentFilter();
 
 		// Set up the mapView.
 		MapView mapView = (MapView) findViewById(R.id.mapview);
@@ -73,12 +79,12 @@ public class BartlebyActivity extends MapActivity {
 		//DataView dataView = new DataView(this, db, requester);
 		
 		PropertyOverlay propertyOverlay = new PropertyOverlay(
-				this, getResources().getDrawable(R.drawable.marker), mapView, requester, dataView);
+				this, getResources().getDrawable(R.drawable.marker), mapView);
 		
 		geocoder = new AsyncGeocoder(this);
 		
 		// Set up the server pinger.
-		final Activity activity = this;
+		//final Activity activity = this;
 		/*pinger = new ServerPinger(getString(R.string.root_url), new ServerPingerListener() {
 			@Override
 			public boolean onAlive() {
@@ -111,7 +117,7 @@ public class BartlebyActivity extends MapActivity {
 		overlays.add(propertyOverlay);
 		
 	}
-	
+
 	/**
 	 * When the application resumes, look up where we are now.  Let the user
 	 * know if we can't find out.  Also, make sure to resume the geocoder.
@@ -119,6 +125,8 @@ public class BartlebyActivity extends MapActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		registerReceiver(receiver, filter);
+
 		//pinger.ping();
 		geocoder.resume(this);
 		if(!NetworkUtils.isNetworkAvailable(this)) {
@@ -140,6 +148,7 @@ public class BartlebyActivity extends MapActivity {
 		super.onPause();
 		//pinger.stop();
 		geocoder.pause();
+		unregisterReceiver(receiver);
 	}
 	
 	/**
@@ -151,21 +160,6 @@ public class BartlebyActivity extends MapActivity {
 		search.focus();
 		return true;
 	}
-	/**
-	 * Absorb search events
-	 * @param keyCode
-	 * @param repeatCount
-	 * @param event
-	 * @return
-	 */
-	/*@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		switch(keyCode) {
-		
-		}
-		onSe
-		return false;
-	}*/
 	
 	/**
 	 * Create the options menu.
@@ -186,6 +180,21 @@ public class BartlebyActivity extends MapActivity {
 			}
 		});
 	    return true;
+	}
+	
+	/**
+	 * Switch to specialized activity when viewing child.
+	 */
+	@Override
+	public void viewChild(View view) {
+		String childId = (String) view.getTag(R.id.child_id);
+		startActivity(new Intent(this, CausticAndroidActivity.class));
+	}
+
+	@Override
+	public void loadWaitingRequest(View view) {
+		String waitId = (String) view.getTag(R.id.wait_id);
+		startService(CausticForceIntent.newForce(waitId));
 	}
 	
 	@Override

@@ -4,15 +4,12 @@
  */
 package com.accursedware.bartleby;
 
-import java.util.Map;
-
-import net.caustic.android.activity.AndroidRequester;
-import net.caustic.android.activity.DataView;
-
 import com.readystatesoftware.mapviewballoons.BalloonOverlayView;
 
 import android.content.Context;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 
 /**
  * This view shows a balloon with the currently selected property's data.
@@ -20,14 +17,7 @@ import android.widget.LinearLayout;
  *
  */
 class PropertyBalloon extends BalloonOverlayView<Property> {
-	
-	//private final Activity activity;
-	//private final TextView title;
-	private final AndroidRequester requester;
-	private final LinearLayout innerLayout;
-	private final DataView dataView;
-	//private final LinearLayout loading;
-	
+		
 	/**
 	 * The currently displayed scope
 	 */
@@ -37,21 +27,19 @@ class PropertyBalloon extends BalloonOverlayView<Property> {
 	 * @param context
 	 * @param balloonBottomOffset
 	 */
-	public PropertyBalloon(Context context, int balloonBottomOffset,
-			AndroidRequester requester, DataView dataView) {
+	public PropertyBalloon(Context context, int balloonBottomOffset) {
 		super(context, balloonBottomOffset);
 		//db.addListener(this);
 		
 		//this.activity = activity;
-		this.requester = requester;
 		//title = (TextView) findViewById(R.id.balloon_item_title);
-		this.dataView = dataView;
 		//snippet = (TextView) findViewById(R.id.balloon_item_snippet);
 		
-		innerLayout = (LinearLayout) findViewById(R.id.balloon_inner_layout);
+		ViewGroup innerLayout = (ViewGroup) findViewById(R.id.balloon_inner_layout);
+		
 		
 		//dataView = new GenericDataView(db, requester, innerLayout);
-		innerLayout.addView(dataView.getUnderlyingView());
+		//innerLayout.addView(dataView.getUnderlyingView());
 		//loading = (LinearLayout) View.inflate(getContext(), R.layout.loading, innerLayout);
 	}
 	
@@ -71,7 +59,7 @@ class PropertyBalloon extends BalloonOverlayView<Property> {
 		//dataView.getUnderlyingView().setVisibility(GONE);
 		//loading.setVisibility(VISIBLE);
 		
-		dataView.setScope(item.getAddress().getID().toString(), address.getLocalString());
+		//dataView.setScope(item.getAddress().getID().toString(), address.getLocalString());
 		
 		// TODO this needs to be requested!
 		//requester.request(address);
