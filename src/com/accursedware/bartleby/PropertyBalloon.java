@@ -4,11 +4,17 @@
  */
 package com.accursedware.bartleby;
 
+import net.caustic.android.activity.DataAdapter;
+import net.caustic.android.activity.DataUpdateReceiver;
+import net.caustic.android.service.CausticServiceIntent.CausticRefreshIntent;
+
 import com.readystatesoftware.mapviewballoons.BalloonOverlayView;
 
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 /**
@@ -23,20 +29,28 @@ class PropertyBalloon extends BalloonOverlayView<Property> {
 	 */
 	//private BartlebyAddress curAddress;
 	
+	private final Context context;
+	private final DataUpdateReceiver receiver;
+	
 	/**
 	 * @param context
 	 * @param balloonBottomOffset
 	 */
-	public PropertyBalloon(Context context, int balloonBottomOffset) {
+	public PropertyBalloon(Context context, int balloonBottomOffset, DataAdapter adapter,
+			DataUpdateReceiver receiver) {
 		super(context, balloonBottomOffset);
 		//db.addListener(this);
 		
+		this.context = context;
+		this.receiver = receiver;
 		//this.activity = activity;
 		//title = (TextView) findViewById(R.id.balloon_item_title);
 		//snippet = (TextView) findViewById(R.id.balloon_item_snippet);
 		
 		ViewGroup innerLayout = (ViewGroup) findViewById(R.id.balloon_inner_layout);
-		
+		ListView dataView = (ListView) View.inflate(context, R.layout.data_view, null);
+		dataView.setAdapter(adapter);
+		innerLayout.addView(dataView);
 		
 		//dataView = new GenericDataView(db, requester, innerLayout);
 		//innerLayout.addView(dataView.getUnderlyingView());
@@ -50,7 +64,11 @@ class PropertyBalloon extends BalloonOverlayView<Property> {
 	public void setData(Property item) {
 		super.setData(item);
 		
-		BartlebyAddress address = item.getAddress();
+		String id = item.getAddress().getID().toString();
+		receiver.listenTo(id);
+		
+		context.startService(CausticRefreshIntent.newRefresh(id));
+		
 		//curAddress = address;
 		
 		//title.setVisibility(VISIBLE);

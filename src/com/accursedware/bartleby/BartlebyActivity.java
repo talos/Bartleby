@@ -6,16 +6,13 @@ package com.accursedware.bartleby;
 
 import java.util.List;
 
+import net.caustic.android.activity.CausticAndroidActivity;
 import net.caustic.android.activity.CausticAndroidButtons;
 import net.caustic.android.activity.DataAdapter;
 import net.caustic.android.activity.DataUpdateReceiver;
-import net.caustic.android.service.CausticIntent;
-import net.caustic.android.service.CausticIntent.CausticForceIntent;
-import net.caustic.android.service.CausticIntent.CausticRefreshIntent;
+import net.caustic.android.service.CausticServiceIntent.CausticForceIntent;
 import net.caustic.android.service.CausticIntentFilter;
-import net.caustic.log.AndroidLogger;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -58,30 +55,46 @@ public class BartlebyActivity extends MapActivity implements CausticAndroidButto
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	}
-	
-	@Override
-	protected void onStart() {
-		super.onStart();
-		
-		// Inflate main layout.
-		setContentView(R.layout.main);
 
 		adapter = new DataAdapter();
 		receiver = new DataUpdateReceiver(adapter);
 		filter = new CausticIntentFilter();
+
+		// Inflate main layout.
+		setContentView(R.layout.main);
 
 		// Set up the mapView.
 		MapView mapView = (MapView) findViewById(R.id.mapview);
 		mapView.setBuiltInZoomControls(true);
 		locator = new Locator(this, mapView.getController());
 		
-		//DataView dataView = new DataView(this, db, requester);
-		
 		PropertyOverlay propertyOverlay = new PropertyOverlay(
-				this, getResources().getDrawable(R.drawable.marker), mapView);
+				this, getResources().getDrawable(R.drawable.marker), mapView, adapter, receiver);
 		
 		geocoder = new AsyncGeocoder(this);
+
+		// Set up the auto-complete address text view.
+		search = new AddressSearchView(this, geocoder,
+				(AutoCompleteTextView) findViewById(R.id.autocomplete_address),
+				(ProgressBar) findViewById(R.id.autocomplete_progress), 
+				mapView, propertyOverlay);
+		
+		// This overlay catches all random clicks and creates new points.
+		FallThroughOverlay fallThrough = new FallThroughOverlay(this, geocoder,
+				mapView.getController(),
+				search, propertyOverlay);
+		
+		// Add the overlays.
+		List<Overlay> overlays = mapView.getOverlays();
+		overlays.add(fallThrough);
+		overlays.add(propertyOverlay);
+
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		
 		
 		// Set up the server pinger.
 		//final Activity activity = this;
@@ -100,21 +113,6 @@ public class BartlebyActivity extends MapActivity implements CausticAndroidButto
 			
 		});*/
 		
-		// Set up the auto-complete address text view.
-		search = new AddressSearchView(this, geocoder,
-				(AutoCompleteTextView) findViewById(R.id.autocomplete_address),
-				(ProgressBar) findViewById(R.id.autocomplete_progress), 
-				mapView, propertyOverlay);
-		
-		// This overlay catches all random clicks and creates new points.
-		FallThroughOverlay fallThrough = new FallThroughOverlay(this, geocoder,
-				mapView.getController(),
-				search, propertyOverlay);
-		
-		// Add the overlays.
-		List<Overlay> overlays = mapView.getOverlays();
-		overlays.add(fallThrough);
-		overlays.add(propertyOverlay);
 		
 	}
 
@@ -188,7 +186,7 @@ public class BartlebyActivity extends MapActivity implements CausticAndroidButto
 	@Override
 	public void viewChild(View view) {
 		String childId = (String) view.getTag(R.id.child_id);
-		startActivity(new Intent(this, CausticAndroidActivity.class));
+		CausticAndroidActivity.launch(this, childId);
 	}
 
 	@Override

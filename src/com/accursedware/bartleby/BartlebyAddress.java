@@ -4,6 +4,8 @@
  */
 package com.accursedware.bartleby;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -138,11 +140,11 @@ public final class BartlebyAddress {
 	}
 	
 	/**
-	 * 
+	 * @param baseUrl A {@link URI} base URI upon which to resolve.
 	 * @return A {@link String} path to scrapers for this address.
 	 */
-	public final String getPath() {
-		return zip + '/';
+	public final String getPath(URI baseUri) {
+		return baseUri.resolve(zip + '/').toString();
 	}
 	
 	public final UUID getID() {
